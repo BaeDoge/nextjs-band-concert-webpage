@@ -314,8 +314,8 @@ export default function Home() {
         <div className="activity-gallery-heading"><span>DAEIL BAND ARCHIVE</span><b>함께한 순간들</b></div>
         <div className="activity-marquee" onContextMenu={event=>event.preventDefault()} aria-label="대일밴드 활동 사진">
           <div className="activity-marquee-track">
-            <img src="/images/activity-gallery.svg" alt="대일밴드 활동 사진 모음" draggable={false} onDragStart={event=>event.preventDefault()}/>
-            <img src="/images/activity-gallery.svg" alt="" aria-hidden="true" draggable={false} onDragStart={event=>event.preventDefault()}/>
+            <img src="/images/activity-gallery.svg.gz" alt="대일밴드 활동 사진 모음" draggable={false} onDragStart={event=>event.preventDefault()}/>
+            <img src="/images/activity-gallery.svg.gz" alt="" aria-hidden="true" draggable={false} onDragStart={event=>event.preventDefault()}/>
           </div>
         </div>
       </Reveal>
