@@ -12,7 +12,7 @@ export async function GET(req,ctx){
   if(!process.env.SUPABASE_URL)missingEnv.push("SUPABASE_URL");
   if(!(process.env.SUPABASE_SECRET_KEY||process.env.SUPABASE_SERVICE_ROLE_KEY))missingEnv.push("SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY)");
   const adminConfigured=!!process.env.ADMIN_ACCESS_KEY;
-  if(missingEnv.length)return NextResponse.json({configured:false,adminConfigured,missingEnv,message:"Vercel Project Settings → Environment Variables에서 Supabase URL과 서버용 Secret Key를 확인한 뒤 새 배포를 해주세요."});
+  if(missingEnv.length)return NextResponse.json({configured:false,adminConfigured,missingEnv,message:"Production 환경변수 누락: "+missingEnv.join(", ")+". Vercel Project Settings → Environment Variables에서 추가한 뒤 새 배포를 해주세요."});
   const client=db();
   if(!client)return NextResponse.json({configured:false,adminConfigured,message:"Supabase 서버 키를 읽을 수 없습니다. 환경변수 이름과 배포 환경을 확인해 주세요."});
   const tables=[["cheers","id"],["questions","id"],["rsvps","visitor_id"]];
@@ -21,7 +21,7 @@ export async function GET(req,ctx){
    return {table,error:error?{code:error.code||"UNKNOWN",message:error.message||""}:null};
   }));
   const errors=checks.filter(v=>v.error);
-  if(errors.length)return NextResponse.json({configured:false,adminConfigured,dbReady:false,tableErrors:errors,message:"Supabase 키는 읽었지만 테이블 조회에 실패했습니다. SQL Editor에서 supabase/schema.sql을 실행했는지, Secret Key가 해당 프로젝트의 키인지 확인해 주세요."});
+  if(errors.length)return NextResponse.json({configured:false,adminConfigured,dbReady:false,tableErrors:errors.map(item=>({table:item.table,code:item.error.code})),message:"Supabase 테이블 조회 실패: "+errors.map(item=>item.table+" ("+item.error.code+")").join(", ")+". SQL Editor에서 supabase/schema.sql 실행 여부와 해당 프로젝트의 Secret Key인지 확인해 주세요."});
   return NextResponse.json({configured:true,adminConfigured,dbReady:true});
  }
  const client=db();if(!client)return missing();
