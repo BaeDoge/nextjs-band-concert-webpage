@@ -79,6 +79,7 @@ export default function Home() {
   const [summary,setSummary]=useState({yes:0,maybe:0,no:0});
   const [videoError,setVideoError]=useState(false);
   const [overlayMounted,setOverlayMounted]=useState(false);
+  const [galleryEnabled,setGalleryEnabled]=useState(true);
   const siteUrl="https://daeil-band.vercel.app";
   const {scrollYProgress}=useScroll();
   const progress=useSpring(scrollYProgress,{stiffness:100,damping:30,restDelta:.001});
@@ -149,9 +150,18 @@ export default function Home() {
         if(active&&data.summary)setSummary(data.summary);
       }catch{}
     };
+    const loadGallerySetting=async()=>{
+      try{
+        const response=await fetch("/api/gallery",{cache:"no-store"});
+        if(!response.ok)return;
+        const data=await response.json();
+        if(active)setGalleryEnabled(Boolean(data.enabled));
+      }catch{}
+    };
     loadStatus();
     refreshLive().then(()=>{initialSnapshotLoaded=true;});
     loadRsvp();
+    loadGallerySetting();
     const poll=window.setInterval(refreshLive,10000);
     return()=>{active=false;window.clearInterval(poll);};
   },[]);
@@ -266,7 +276,7 @@ export default function Home() {
       <div className="schedule-head"><h2>SHOW<br/><em>SCHEDULE.</em></h2><div className="calendar"><CalendarDays/><b>21</b><span>NOV / SAT</span><small>2026</small></div></div>
       <div className="timeline">
         <div className="time-row active"><b>18:00</b><i/><div><small>1부</small><h3>대일밴드 공연 시작</h3><p>대일밴드의 첫 번째 무대입니다.</p></div><span>90분</span></div>
-        <div className="time-row"><b>19:30</b><i/><div><small>2부</small><h3>2부 공연 시작</h3><p>이어지는 무대도 함께 즐겨주세요.</p></div><span>—</span></div>
+        <div className="time-row"><b>19:30</b><i/><div><small>2부</small><h3>2부 공연 시작</h3><p>이어지는 무대도 함께 즐겨주세요.</p></div><span>90분</span></div>
         <div className="time-row"><b>21:00</b><i/><div><small>전체 행사</small><h3>전체 행사 마무리</h3><p>아쉬움은 뒤풀이에서 이어가요.</p></div><span>종료</span></div>
       </div>
       <div className="venue"><div><MapPin/></div><section><small>VENUE</small><b>목동 제이에스아트홀</b><p>서울 양천구 등촌로 36 지하 1층 (목동)</p><div className="venue-links"><a href="https://map.naver.com/p/search/목동%20제이에스아트홀" target="_blank" rel="noreferrer">NAVER MAP ↗</a><a href="https://map.kakao.com/?q=서울%20양천구%20등촌로%2036" target="_blank" rel="noreferrer">KAKAO MAP ↗</a></div></section></div>
@@ -282,13 +292,13 @@ export default function Home() {
     <section className="section cheers" id="cheer">
       <div className="kicker inverse"><span>05 / CHEER</span><span>SEND SOME LOVE</span></div>
       <div className="cheer-grid"><Reveal><p className="eyebrow">대일밴드에게 보내는 응원</p><h2>응원으로<br/><em>함께해요.</em></h2><p className="body-copy">응원 버튼을 누르면 다른 관객에게도<br/>닉네임과 함께 응원 애니메이션이 보여요.</p></Reveal>
-      <Reveal className="cheer-box" delay={.12}><div className="cheer-count"><b>{cheerCount.toLocaleString("ko-KR")}</b><small>누적 응원</small></div><div className="reaction-grid">{reactions.map(([emoji,label])=><button type="button" aria-label={label} key={emoji} onClick={()=>cheer(emoji)}><b>{emoji}</b></button>)}</div><p className="cheer-message" role="status">{cheerMessage}</p><div className="cheer-wall"><div><span>최근 도착한 응원</span><b><i/> 실시간</b></div><section>{cheers.slice(0,6).map((item,i)=><span key={item.id||i}>{item.emoji} <small>{item.nickname||"익명의 관객"}</small></span>)}{!cheers.length&&<small>첫 응원을 남겨주세요.</small>}</section></div></Reveal></div>
+      <Reveal className="cheer-box" delay={.12}><div className="cheer-count"><b>{cheerCount.toLocaleString("ko-KR")}</b><small>누적 응원</small></div><div className="reaction-grid">{reactions.map(([emoji,label])=><button type="button" aria-label={label} key={emoji} onClick={()=>cheer(emoji)}><b>{emoji}</b></button>)}</div><p className="cheer-message" role="status">{cheerMessage}</p><div className="cheer-wall"><div><span>최근 도착한 응원</span><b><i/> 실시간</b></div><section>{cheers.slice(0,10).map((item,i)=><span key={item.id||i}>{item.emoji} <small>{item.nickname||"익명의 관객"}</small></span>)}{!cheers.length&&<small>첫 응원을 남겨주세요.</small>}</section></div></Reveal></div>
     </section>
 
     <section className="section questions" id="questions">
       <div className="kicker"><span>06 / QUESTIONS</span><span>ASK US ANYTHING</span></div>
       <div className="question-grid"><div><p className="eyebrow orange">QUESTIONS & REQUESTS</p><h2>아무거나<br/><em>물어보세요.</em></h2><p className="body-copy">궁금한 점이나 듣고 싶은 이야기를 편하게 남겨주세요.<br/>공연 중간중간 확인하고 답변할게요.</p></div>
-      <Reveal className="question-card" delay={.1}><div className="form-top"><span>MESSAGE BOARD</span><span>DAEIL BAND</span></div><form onSubmit={ask}><label htmlFor="question">보내고 싶은 메시지</label><textarea id="question" value={question} onChange={e=>setQuestion(e.target.value)} maxLength={500} placeholder="드럼 솔로 보여주세요!" required/><div className="form-actions"><small>{question.length} / 500</small><button disabled={!question.trim()}> <Send size={14}/> 메시지 보내기</button></div></form>{questionInfo&&<p className="feedback">{questionInfo}</p>}</Reveal></div>
+      <Reveal className="question-card" delay={.1}><div className="form-top"><span>MESSAGE BOARD</span><span>DAEIL BAND</span></div><form onSubmit={ask}><textarea id="question" value={question} onChange={e=>setQuestion(e.target.value)} maxLength={500} placeholder="드럼 솔로 보여주세요!" required/><div className="form-actions"><small>{question.length} / 500</small><button disabled={!question.trim()}> <Send size={14}/> 메시지 보내기</button></div></form>{questionInfo&&<p className="feedback">{questionInfo}</p>}</Reveal></div>
     </section>
 
     <section className="section after" id="rsvp">
@@ -298,6 +308,8 @@ export default function Home() {
     </section>
 
     <section className="section qr-section"><Reveal className="qr-card"><div><p className="eyebrow orange">공연 페이지 공유</p><h2>대일밴드<br/><em>공연에서 만나요.</em></h2><p>친구에게 페이지를 공유하고<br/>공연 당일 함께해 주세요.</p><button type="button" className="share-button" onClick={sharePage}><Share2 size={16}/> 공유하기</button>{shareMessage&&<p className="share-message" role="status">{shareMessage}</p>}</div><div className="qr-code"><QRCodeSVG value={siteUrl} size={150} bgColor="#f6f0e7" fgColor="#191715" level="H"/><small>QR 코드로 접속</small></div></Reveal><Reveal className="last-cat"><Cat/></Reveal></section>
+
+    {galleryEnabled&&<section className="activity-gallery-section" aria-label="대일밴드 활동 사진 모음">{gallery}</section>}
 
     <footer><div className="footer-top"><a className="logo cat-logo" href="#top"><img src="/images/cat-headphones.svg" alt="대일밴드 고양이 로고"/></a><p>대일밴드와 함께해 주셔서 감사합니다.</p><a href="#top">맨 위로 ↑</a></div><div className="footer-bottom"><span>© 2026 DAEIL BAND <i>·</i> 배승호 Bae Seung Ho</span><span>2026.11.21 · 18:00 — 21:00</span></div></footer>
     <div className="sticky-rsvp"><a href="#rsvp">뒤풀이 참석 여부 보내기 ↗</a></div>
