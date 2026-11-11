@@ -2,46 +2,90 @@
 
 2026년 11월 21일 공연용 모바일 우선 안내 페이지입니다. Next.js + Vercel + Supabase로 구성했습니다.
 
-## 로컬 실행
-```bash
+## 1. 사전 준비
+- Node.js 20.9 이상 (Node.js 22 LTS 권장)
+- Git, Supabase 프로젝트, Vercel 계정
+
+## 2. 로컬 설치 (Windows CMD)
+```bat
+git clone https://github.com/BaeDoge/nextjs-band-concert-webpage.git
+cd nextjs-band-concert-webpage
+node -v
+npm -v
 npm install
-cp .env.example .env.local
+```
+Next.js 16은 Node.js 20.9 이상이 필요합니다. https://nextjs.org/docs/app/getting-started/installation
+
+## 3. 고양이 이미지와 영상 추가
+전달된 band-night-media-assets.zip을 다운로드해 압축을 풉니다. ZIP 안의 public 폴더를 프로젝트 루트에 복사해 기존 public 폴더와 병합합니다.
+- public/images/guitar-cat.webp
+- public/media/concert-cat.mp4
+
+## 4. Supabase 데이터베이스 준비
+1. Supabase Dashboard에서 프로젝트를 엽니다.
+2. SQL Editor로 이동합니다.
+3. 저장소의 supabase/schema.sql 파일 전체 내용을 SQL Editor에 붙여넣고 Run을 실행합니다.
+4. Table Editor에서 cheers, questions, rsvps 세 테이블이 만들어졌는지 확인합니다.
+
+## 5. 환경변수 설정
+프로젝트 루트의 CMD에서 실행합니다.
+```bat
+copy .env.example .env.local
+notepad .env.local
+```
+아래 값으로 채웁니다.
+```env
+SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+SUPABASE_SECRET_KEY=sb_secret_...
+ADMIN_ACCESS_KEY=길고_예측하기_어려운_임의의_비밀번호
+```
+- SUPABASE_URL: Supabase Project URL
+- SUPABASE_SECRET_KEY: Settings → API Keys에서 만든 서버용 Secret key (sb_secret_...)
+- ADMIN_ACCESS_KEY: 직접 정하는 관리자 로그인 비밀번호
+구형 service_role 키(eyJ...)를 쓴다면 SUPABASE_SECRET_KEY 대신 SUPABASE_SERVICE_ROLE_KEY에 설정해도 됩니다.
+Secret key와 관리자 비밀번호는 서버 전용입니다. NEXT_PUBLIC_ 접두사를 붙이거나 GitHub에 커밋하지 마세요.
+
+## 6. 로컬 실행 및 확인
+```bat
 npm run dev
 ```
+브라우저에서 http://localhost:3000 을 엽니다.
+- 응원 이모티콘을 누르면 응원 수가 증가하는지 확인합니다.
+- 질문을 보낸 뒤 http://localhost:3000/host 에서 ADMIN_ACCESS_KEY로 로그인해 질문을 확인합니다.
+- 뒤풀이 참석 응답 저장과 새로고침 후 유지 여부를 확인합니다.
+개발 서버 종료는 CMD에서 Ctrl + C입니다.
 
-Supabase 연결 전에는 화면 미리보기 모드로 동작합니다. 응원, 질문, 뒤풀이 응답의 서버 저장은 Supabase 환경변수를 등록해야 활성화됩니다.
-
-## Supabase 설정
-1. Supabase 프로젝트를 생성합니다.
-2. SQL Editor에서 `supabase/schema.sql`을 실행합니다.
-3. Project Settings → API에서 Project URL과 service_role key를 확인합니다.
-4. 로컬 `.env.local` 및 Vercel Environment Variables에 아래 값을 설정합니다. 현재 Supabase 대시보드에서 만든 새 Secret Key(`sb_secret_...`)를 권장합니다. 기존 `service_role` 키(`eyJ...`)를 사용 중이면 `SUPABASE_SERVICE_ROLE_KEY`에 넣어도 됩니다.
-
-```env
-SUPABASE_URL=https://YOUR-PROJECT.supabase.co
-SUPABASE_SECRET_KEY=sb_secret_...
-ADMIN_ACCESS_KEY=긴_랜덤_비밀번호
+배포 전 프로덕션 빌드를 검사합니다.
+```bat
+npm run build
 ```
 
-서버 키는 반드시 `SUPABASE_SECRET_KEY` 또는 `SUPABASE_SERVICE_ROLE_KEY` 환경변수로만 설정하고, `NEXT_PUBLIC_` 접두사를 붙이지 마세요.
+## 7. 미디어 파일을 GitHub에 반영
+압축 해제 후 프로젝트 루트에서 실행합니다.
+```bat
+git add public/images/guitar-cat.webp public/media/concert-cat.mp4
+git commit -m "assets: add concert cat media"
+git push origin main
+```
 
-service-role key와 ADMIN_ACCESS_KEY는 서버 비밀값입니다. 절대 NEXT_PUBLIC_ 접두사를 붙이거나 Git에 커밋하지 마세요.
+## 8. Vercel 배포
+1. https://vercel.com/dashboard 에 로그인합니다.
+2. Add New → Project에서 BaeDoge/nextjs-band-concert-webpage 저장소를 Import합니다.
+3. Framework Preset은 Next.js, Root Directory는 저장소 루트로 설정합니다.
+4. Project Settings → Environment Variables에서 SUPABASE_URL, SUPABASE_SECRET_KEY, ADMIN_ACCESS_KEY를 등록합니다.
+5. Production과 Preview 환경을 선택하고 Deploy합니다.
+이미 GitHub 저장소를 Vercel에 연결했다면 main 브랜치 Push 시 자동 배포됩니다. 환경변수를 수정한 경우에는 새 배포가 필요합니다.
 
-## 이미지/영상 파일
-첨부 원본 파일을 아래 경로로 복사해 주세요.
-- 고양이 영상: `public/media/concert-cat.mp4`
-- 기타 고양이 WebP: `public/images/guitar-cat.webp`
+## 9. 배포 후 확인
+- https://배포도메인/api/status 에서 configured 값이 true인지 확인합니다.
+- https://배포도메인/api/cheers 에서 JSON 응답이 오는지 확인합니다.
+- https://배포도메인/host 에서 운영자 로그인과 질문 확인을 테스트합니다.
+- 모바일에서 Vercel 배포 도메인으로 QR 접속을 테스트합니다. localhost QR은 외부 관객이 접속할 수 없습니다.
 
-영상은 8초, 406×720, 24fps입니다. 원본에 없는 디테일을 실제로 복원하는 업스케일은 불가능해 원본을 보존하도록 구성했습니다. 워터마크도 원본 그대로 사용합니다.
-
-## Vercel
-GitHub 저장소를 Vercel에 Import하고 환경변수 3개를 등록한 뒤 Deploy합니다. QR 섹션은 현재 접속 도메인으로 QR을 자동 생성합니다.
-
-운영자는 배포 주소의 `/host`에서 ADMIN_ACCESS_KEY로 로그인해 관객 질문을 읽고 답변할 수 있습니다. 키는 관객에게 공유하지 마세요.
-
-## 입력 정보
-- 전체 행사: 2026.11.21 (토) 18:00–21:00
-- 밴드 공연: 18:00–19:30
-- 셋리스트 11곡, 멤버 정보: 전달받은 내용 반영
-- 공연 장소: 목동 제이에스아트홀, 서울 양천구 등촌로 36 지하 1층 (목동)
-- 밴드 공식 명칭과 뒤풀이 장소/시간: 미정
+## 공연 정보
+- 날짜: 2026.11.21 (토)
+- 전체 행사: 18:00–21:00
+- 우리 밴드: 18:00–19:30
+- 장소: 목동 제이에스아트홀 (서울 양천구 등촌로 36 지하 1층, 목동)
+- 셋리스트 11곡 및 멤버 정보: 전달받은 내용 반영
+- 밴드 공식 명칭 및 뒤풀이 장소/시간: 추후 확정 시 업데이트
