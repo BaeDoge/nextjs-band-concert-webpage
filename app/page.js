@@ -163,7 +163,7 @@ export default function Home() {
     e.preventDefault();if(!question.trim())return;
     if(!ready){setQuestionInfo(setupMessage||"메시지 전송 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.");return;}
     setQuestionInfo("전송 중...");
-    try{const r=await fetch("/api/questions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body:question.trim()})});const d=await r.json();if(!r.ok)throw Error(d.error);setQuestion("");setQuestionInfo("메시지를 전달했어요. 고마워요!");}
+    try{const r=await fetch("/api/questions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body:question.trim(),nickname:nickname||"관객"})});const d=await r.json();if(!r.ok)throw Error(d.error);setQuestion("");setQuestionInfo("메시지를 전달했어요. 고마워요!");}
     catch(e){setQuestionInfo(e.message||"전송에 실패했어요.");}
   };
   const rsvp=async e=>{
