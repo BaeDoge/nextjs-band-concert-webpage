@@ -1,6 +1,6 @@
 # BAND NIGHT 2026
 
-2026년 11월 21일 공연용 모바일 우선 안내 페이지입니다. Next.js + Vercel + Supabase로 구성했습니다.
+2026년 11월 21일 대일밴드 공연용 모바일 우선 안내 페이지입니다. Next.js + Vercel + Supabase로 구성했습니다. 배포 주소: https://daeil-band.vercel.app
 
 ## 1. 사전 준비
 - Node.js 20.9 이상 (Node.js 22 LTS 권장)
