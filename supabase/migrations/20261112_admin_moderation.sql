@@ -41,6 +41,10 @@ as $$
       select jsonb_object_agg(emoji, cnt)
       from (select emoji, count(*) as cnt from public.cheers group by emoji) s
     ), '{}'::jsonb),
+    'cheers_by_visitor', coalesce((
+      select jsonb_object_agg(visitor_id, cnt)
+      from (select visitor_id, count(*) as cnt from public.cheers where visitor_id is not null group by visitor_id) s
+    ), '{}'::jsonb),
     'total_messages', (select count(*) from public.questions),
     'pending_messages', (select count(*) from public.questions where status = 'pending'),
     'answered_messages', (select count(*) from public.questions where status = 'answered'),
