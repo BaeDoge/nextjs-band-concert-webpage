@@ -101,7 +101,7 @@ export async function GET(req,ctx){
 
  if(action==="admin"){
   if(!admin(req))return jsonError("운영자 인증이 필요해요.",401);
-  const[statsResult,visitorsResult,cheersResult,questionsResult]=await Promise.all([
+  const[statsResult,visitorsResult,questionsResult]=await Promise.all([
    client.rpc("daeil_admin_stats"),
    client.from("visitors").select("visitor_id,nickname,blocked,block_reason,created_at,last_seen").order("last_seen",{ascending:false}).limit(500),
    client.from("questions").select("id,nickname,visitor_id,body,answer,status,created_at,answered_at").order("created_at",{ascending:false}).limit(500)
