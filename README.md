@@ -98,3 +98,12 @@ git push origin main
 Vercel Project Settings → Environment Variables에서 `SUPABASE_URL`, `SUPABASE_SECRET_KEY`(또는 `SUPABASE_SERVICE_ROLE_KEY`)를 **Production** 환경에 등록했는지 확인하세요. 운영자 질문함을 사용하려면 `ADMIN_ACCESS_KEY`도 Production에 필요합니다. 값을 추가하거나 수정했다면 반드시 새 Production Deployment를 실행해야 합니다.
 
 응원 수는 DB에 저장된 전체 행 개수를 기준으로 표시합니다. 관리자 페이지에서 초기화하면 `cheers` 테이블의 기록이 삭제되고 관객 화면도 다음 동기화 때 0으로 바뀝니다.
+
+
+## 화면 및 디자인 개선
+
+- 한글 웹폰트: Pretendard Variable (jsDelivr CDN, 시스템 폰트 fallback 포함)
+- 메인 히어로: 타이틀/고양이 영상/공연 카운트다운 중심으로 구성
+- 공연장 약도: Google Maps 주소 검색 임베드, 네이버/카카오 지도 링크
+- 응원 애니메이션: 페이지 전체에 표시되며 3초 주기로 새 응원 기록을 확인
+- 메시지: 입장 닉네임과 메시지 내용을 함께 저장하며 관리자 화면에서 발신자 확인
