@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Cat face placeholder">
+  <rect width="64" height="64" rx="20" fill="#ff6335"/>
+  <path d="M12 27 15 9l15 11h4L49 9l3 18c3 4 5 9 5 15 0 13-10 18-25 18S7 55 7 42c0-6 2-11 5-15Z" fill="#fff4e8" stroke="#261c18" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M17 25 18.5 15 27 22M47 25 45.5 15 37 22" fill="#f5b49a" stroke="#261c18" stroke-width="2" stroke-linejoin="round"/>
+  <ellipse cx="23" cy="37" rx="3" ry="4" fill="#261c18"/><ellipse cx="41" cy="37" rx="3" ry="4" fill="#261c18"/>
+  <path d="M29 44q3-3 6 0l-3 3Z" fill="#ff6335" stroke="#261c18" stroke-width="1.2"/>
+  <path d="M32 47v3m0 0q-5 5-9 0m9 0q5 5 9 0" fill="none" stroke="#261c18" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M9 42 22 44m-13 4 13-1m33-5-13 2m13 4-13-1" fill="none" stroke="#261c18" stroke-width="1.2" stroke-linecap="round"/>
+</svg>
