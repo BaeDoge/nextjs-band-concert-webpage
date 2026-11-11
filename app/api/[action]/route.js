@@ -115,7 +115,7 @@ export async function GET(req,ctx){
    client.from("site_settings").select("gallery_enabled").eq("id",1).maybeSingle()
   ]);
   if(statsResult.error||visitorsResult.error||questionsResult.error||rsvpsResult.error||settingsResult.error){
-   return NextResponse.json({error:"관리자 통계를 불러오지 못했어요. supabase/migrations/20261112_admin_moderation.sql을 실행했는지 확인해 주세요."},{status:500});
+   return NextResponse.json({error:"관리자 정보를 불러오지 못했어요. supabase/migrations/20261112_admin_moderation.sql과 20261112_gallery_settings.sql을 실행했는지 확인해 주세요."},{status:500});
   }
   const byVisitor=statsResult.data?.cheers_by_visitor||{};
   const visitors=(visitorsResult.data||[]).map(v=>({...v,cheer_count:Number(byVisitor[v.visitor_id]||0)}));
