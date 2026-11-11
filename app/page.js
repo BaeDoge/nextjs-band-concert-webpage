@@ -98,7 +98,7 @@ export default function Home() {
 
     <section className="hero" id="top">
       <div className="hero-grain"/>
-      <div className="hero-overline"><span>ONE NIGHT, ONE BAND</span><span>SEOUL / KOREA</span></div>
+      <div className="hero-overline"><span>ONE NIGHT, ONE BAND</span><span>LOCATION / TO BE ANNOUNCED</span></div>
       <div className="hero-title">
         <p className="eyebrow"><i/> LIVE PERFORMANCE INVITATION</p>
         <motion.h1 initial={{opacity:0,y:35}} animate={{opacity:1,y:0}} transition={{duration:1,ease:[.22,1,.36,1]}}>BAND<br/><em>NIGHT</em><sup>26</sup></motion.h1>
