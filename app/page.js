@@ -32,7 +32,7 @@ function Countdown() {
   return <div className="countdown">{(time||[0,0,0,0]).map((v,i)=><div key={i}><b>{String(v).padStart(2,"0")}</b><small>{["DAYS","HOURS","MINS","SECS"][i]}</small></div>)}</div>;
 }
 function Cat({className=""}) {
-  return <div className={"cat-wrap "+className}><img src="/images/guitar-cat.png" alt="헤드폰을 쓰고 기타를 연주하는 오렌지색 고양이" onError={e=>e.currentTarget.style.display="none"}/><span className="cat-fallback">🐈🎸</span><i>✳</i><b>✦</b></div>;
+  return <div className={"cat-wrap "+className}><img src="/images/guitar-cat.png" alt="헤드폰을 쓰고 기타를 연주하는 오렌지색 고양이" onError={e=>{e.currentTarget.style.display="none";if(e.currentTarget.nextElementSibling)e.currentTarget.nextElementSibling.style.display="block";}}/><span className="cat-fallback">🐈🎸</span><i>✳</i><b>✦</b></div>;
 }
 
 export default function Home() {
@@ -78,7 +78,7 @@ export default function Home() {
     e.preventDefault();if(!question.trim())return;
     if(!ready){setQuestionInfo("질문함 서버가 아직 연결되지 않았어요. Supabase 연결 후 전송할 수 있어요.");return;}
     setQuestionInfo("전송 중...");
-    try{const r=await fetch("/api/questions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nickname,body:question.trim()})});const d=await r.json();if(!r.ok)throw Error(d.error);setQuestion("");setQuestionInfo("승호에게 익명으로 전달했어요. 공연 중 확인할게요!");}
+    try{const r=await fetch("/api/questions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body:question.trim()})});const d=await r.json();if(!r.ok)throw Error(d.error);setQuestion("");setQuestionInfo("승호에게 익명으로 전달했어요. 공연 중 확인할게요!");}
     catch(e){setQuestionInfo(e.message||"전송에 실패했어요.");}
   };
   const rsvp=async e=>{
