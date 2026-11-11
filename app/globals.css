@@ -440,3 +440,21 @@ button,input,textarea,select{font-family:inherit}
 @media(prefers-reduced-motion:reduce){
  .activity-marquee-track{animation:none;transform:translateX(0)}
 }
+
+/* Latest invitation alignment and activity photo carousel tuning */
+.qr-card .share-invite-copy{text-align:center;width:100%;max-width:380px;margin:20px auto 14px}
+.qr-card .share-button{display:flex;width:max-content;min-width:150px;margin:0 auto;align-items:center;justify-content:center}
+.qr-card .share-message{text-align:center}
+.schedule-seating-note{margin:0 0 12px;color:#8f8378;font-size:12px;line-height:1.5;letter-spacing:-.01em}
+.activity-marquee-track{animation-duration:42s}
+.activity-marquee-track img{height:clamp(150px,16vw,185px);margin-right:18px}
+@media(max-width:800px){
+ .qr-card .share-invite-copy{margin:14px auto 12px;font-size:12px}
+ .qr-card .share-button{min-width:142px;margin:0 auto}
+ .schedule-seating-note{font-size:11px;margin-bottom:10px}
+ .activity-marquee-track{animation-duration:34s}
+ .activity-marquee-track img{height:136px;margin-right:14px}
+}
+@media(max-width:420px){
+ .activity-marquee-track img{height:126px}
+}
