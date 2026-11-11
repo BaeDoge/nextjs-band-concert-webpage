@@ -1,13 +1,13 @@
 import {NextResponse} from "next/server";
 import {createClient} from "@supabase/supabase-js";
 export const runtime="nodejs";
-const db=()=>process.env.SUPABASE_URL&&process.env.SUPABASE_SERVICE_ROLE_KEY?createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}}):null;
+const db=()=>{const key=process.env.SUPABASE_SECRET_KEY||process.env.SUPABASE_SERVICE_ROLE_KEY;return process.env.SUPABASE_URL&&key?createClient(process.env.SUPABASE_URL,key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}}):null;};
 const missing=()=>NextResponse.json({error:"서버 저장소가 아직 연결되지 않았어요."},{status:503});
 const admin=req=>{const a=req.headers.get("x-admin-key")||"",b=process.env.ADMIN_ACCESS_KEY||"";return !!b&&a.length===b.length&&a===b;};
 async function summary(client){const{data,error}=await client.from("rsvps").select("attendance,headcount");if(error)throw error;return(data||[]).reduce((s,r)=>{s[r.attendance]=(s[r.attendance]||0)+(r.attendance==="yes"?Number(r.headcount||0):1);return s;},{yes:0,maybe:0,no:0});}
 export async function GET(req,ctx){
  const{action}=await ctx.params;
- if(action==="status")return NextResponse.json({configured:!!(process.env.SUPABASE_URL&&process.env.SUPABASE_SERVICE_ROLE_KEY&&process.env.ADMIN_ACCESS_KEY)});
+ if(action==="status")return NextResponse.json({configured:!!(process.env.SUPABASE_URL&&(process.env.SUPABASE_SECRET_KEY||process.env.SUPABASE_SERVICE_ROLE_KEY)&&process.env.ADMIN_ACCESS_KEY)});
  const client=db();if(!client)return missing();
  if(action==="cheers"){const{data,error}=await client.from("cheers").select("id,nickname,emoji,created_at").order("created_at",{ascending:false}).limit(12);if(error)return NextResponse.json({error:"응원 목록을 불러오지 못했어요."},{status:500});const{count}=await client.from("cheers").select("id",{count:"exact",head:true});return NextResponse.json({items:data||[],total:count||0});}
  if(action==="rsvp"){try{return NextResponse.json({summary:await summary(client)});}catch{return NextResponse.json({error:"응답 현황 조회 실패"},{status:500});}}
