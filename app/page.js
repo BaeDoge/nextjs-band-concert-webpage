@@ -194,7 +194,7 @@ export default function Home() {
       <div className="kicker"><span>01 / 대일밴드 소개</span><span>2024년 시작</span></div>
       <div className="intro-grid">
         <Reveal><p className="eyebrow orange">대일밴드</p><h2>안녕하세요<br/><em>대일밴드입니다.</em></h2><p className="body-copy">2024년 5명으로 시작해 현재 31명이 함께 활동하고 있는 초보 밴드입니다.<br/>저희가 준비한 노래를 재미있게 즐겨 주셨으면 좋겠습니다.<br/>아낌없는 박수와 호응 부탁드립니다!</p><p className="signature">대일밴드 승호 드림</p></Reveal>
-        <Reveal className="cat-stage" delay={.12}><div className="orbit one"/><div className="orbit two"/><Cat className="intro-cat"/><span className="cat-label">OUR LITTLE<br/>ROCK STAR</span></Reveal>
+        <Reveal className="cat-stage" delay={.12}><div className="orbit one"/><div className="orbit two"/><Cat className="intro-cat"/><span className="cat-label">대일밴드<br/>마스코트</span></Reveal>
       </div>
       <div className="count-panel"><div><small>공연 시작까지</small><b>11월 21일 토요일 오후 6시</b></div><Countdown/></div>
     </section>
@@ -208,13 +208,13 @@ export default function Home() {
 
     <section className="section schedule">
       <div className="kicker"><span>03 / 공연 일정</span><span>2026년 11월 21일 토요일</span></div>
-      <div className="schedule-head"><h2>공연<br/><em>일정 안내.</em></h2><div className="calendar"><CalendarDays/><b>21</b><span>11월 / 토</span><small>2026</small></div></div>
+      <div className="schedule-head"><h2>공연<br/><em>일정 안내.</em></h2><div className="calendar"><CalendarDays/><b>21</b><span>11월 / 토요일</span><small>2026</small></div></div>
       <div className="timeline">
         <div className="time-row active"><b>18:00</b><i/><div><small>1부</small><h3>대일밴드 공연 시작</h3><p>대일밴드의 첫 번째 무대입니다.</p></div><span>90분</span></div>
         <div className="time-row"><b>19:30</b><i/><div><small>2부</small><h3>2부 공연 시작</h3><p>이어지는 무대도 함께 즐겨주세요.</p></div><span>—</span></div>
-        <div className="time-row"><b>21:00</b><i/><div><small>THAT'S A WRAP</small><h3>전체 행사 마무리</h3><p>아쉬움은 뒤풀이에서 이어가요.</p></div><span>END</span></div>
+        <div className="time-row"><b>21:00</b><i/><div><small>전체 행사</small><h3>전체 행사 마무리</h3><p>아쉬움은 뒤풀이에서 이어가요.</p></div><span>종료</span></div>
       </div>
-      <div className="venue"><div><MapPin/></div><section><small>VENUE / LOCATION</small><b>목동 제이에스아트홀</b><p>서울 양천구 등촌로 36 지하 1층 (목동)</p><a href="https://map.naver.com/p/search/목동%20제이에스아트홀" target="_blank" rel="noreferrer">네이버 지도에서 위치 확인 ↗</a></section><span>SEE YOU THERE</span></div>
+      <div className="venue"><div><MapPin/></div><section><small>공연 장소</small><b>목동 제이에스아트홀</b><p>서울 양천구 등촌로 36 지하 1층 (목동)</p><a href="https://map.naver.com/p/search/목동%20제이에스아트홀" target="_blank" rel="noreferrer">네이버 지도에서 위치 확인 ↗</a></section><span>오시는 길</span></div>
     </section>
 
     <section className="section members" id="members">
