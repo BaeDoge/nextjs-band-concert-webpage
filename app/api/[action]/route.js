@@ -245,10 +245,23 @@ export async function PATCH(req,ctx){
 
 export async function DELETE(req,ctx){
  const{action}=await ctx.params;
- if(action!=="cheers")return jsonError("Not found",404);
  if(!admin(req))return jsonError("운영자 인증이 필요해요.",401);
  const client=db();if(!client)return missing();
- const{error}=await client.from("cheers").delete().gte("created_at","1970-01-01T00:00:00.000Z");
- if(error)return jsonError("응원 기록 초기화에 실패했어요.");
- return NextResponse.json({ok:true,total:0});
+
+ if(action==="visitors"){
+  let body={};
+  try{body=await req.json();}catch{return jsonError("삭제할 사용자 정보가 필요해요.",400);}
+  const visitorId=String(body.visitorId||"");
+  if(!uuidPattern.test(visitorId))return jsonError("사용자 ID 형식이 올바르지 않아요.",400);
+  const{data,error}=await client.rpc("daeil_admin_delete_visitor",{p_visitor_id:visitorId});
+  if(error)return jsonError("사용자와 연결된 기록을 삭제하지 못했어요. supabase/migrations/20261112_visitor_delete.sql을 실행했는지 확인해 주세요.");
+  return NextResponse.json({ok:true,deleted:data||{}});
+ }
+
+ if(action==="cheers"){
+  const{error}=await client.from("cheers").delete().gte("created_at","1970-01-01T00:00:00.000Z");
+  if(error)return jsonError("응원 기록 초기화에 실패했어요.");
+  return NextResponse.json({ok:true,total:0});
+ }
+ return jsonError("Not found",404);
 }
