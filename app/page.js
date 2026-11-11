@@ -136,7 +136,7 @@ export default function Home() {
         <div className="time-row"><b>19:30</b><i/><div><small>NEXT CHAPTER</small><h3>밴드 공연 종료</h3><p>이후 프로그램은 추후 안내할게요.</p></div><span>—</span></div>
         <div className="time-row"><b>21:00</b><i/><div><small>THAT'S A WRAP</small><h3>전체 행사 마무리</h3><p>아쉬움은 뒤풀이에서 이어가요.</p></div><span>END</span></div>
       </div>
-      <div className="venue"><div><MapPin/></div><section><small>VENUE / LOCATION</small><b>공연 장소 안내 예정</b><p>장소가 확정되면 이 페이지에 업데이트할게요.</p></section><span>COMING SOON</span></div>
+      <div className="venue"><div><MapPin/></div><section><small>VENUE / LOCATION</small><b>목동 제이에스아트홀</b><p>서울 양천구 등촌로 36 지하 1층 (목동)</p><a href="https://map.naver.com/p/search/목동%20제이에스아트홀" target="_blank" rel="noreferrer">네이버 지도에서 위치 확인 ↗</a></section><span>SEE YOU THERE</span></div>
     </section>
 
     <section className="section members" id="members">
