@@ -15,13 +15,15 @@ Supabase 연결 전에는 화면 미리보기 모드로 동작합니다. 응원,
 1. Supabase 프로젝트를 생성합니다.
 2. SQL Editor에서 `supabase/schema.sql`을 실행합니다.
 3. Project Settings → API에서 Project URL과 service_role key를 확인합니다.
-4. 로컬 `.env.local` 및 Vercel Environment Variables에 아래 값을 설정합니다.
+4. 로컬 `.env.local` 및 Vercel Environment Variables에 아래 값을 설정합니다. 현재 Supabase 대시보드에서 만든 새 Secret Key(`sb_secret_...`)를 권장합니다. 기존 `service_role` 키(`eyJ...`)를 사용 중이면 `SUPABASE_SERVICE_ROLE_KEY`에 넣어도 됩니다.
 
 ```env
 SUPABASE_URL=https://YOUR-PROJECT.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
+SUPABASE_SECRET_KEY=sb_secret_...
 ADMIN_ACCESS_KEY=긴_랜덤_비밀번호
 ```
+
+서버 키는 반드시 `SUPABASE_SECRET_KEY` 또는 `SUPABASE_SERVICE_ROLE_KEY` 환경변수로만 설정하고, `NEXT_PUBLIC_` 접두사를 붙이지 마세요.
 
 service-role key와 ADMIN_ACCESS_KEY는 서버 비밀값입니다. 절대 NEXT_PUBLIC_ 접두사를 붙이거나 Git에 커밋하지 마세요.
 
