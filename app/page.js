@@ -64,6 +64,9 @@ export default function Home() {
     fetch("/api/status").then(r=>r.json()).then(d=>{setReady(!!d.configured);setChecked(true);}).catch(()=>setChecked(true));
     fetch("/api/cheers").then(r=>r.ok?r.json():null).then(d=>{if(d){setCheers(d.items||[]);setCheerCount(d.total||0);}}).catch(()=>{});
     fetch("/api/rsvp").then(r=>r.ok?r.json():null).then(d=>{if(d?.summary)setSummary(d.summary);}).catch(()=>{});
+    const refresh = () => { fetch("/api/cheers").then(r=>r.ok?r.json():null).then(d=>{if(d){setCheers(d.items||[]);setCheerCount(d.total||0);}}).catch(()=>{}); fetch("/api/rsvp").then(r=>r.ok?r.json():null).then(d=>{if(d?.summary)setSummary(d.summary);}).catch(()=>{}); };
+    const poll = window.setInterval(refresh, 7000);
+    return () => window.clearInterval(poll);
   },[]);
 
   const saveName=e=>{e.preventDefault();const n=draft.trim().slice(0,14)||randomName();localStorage.setItem("band-night-name",n);setNickname(n);setWelcome(false);};
