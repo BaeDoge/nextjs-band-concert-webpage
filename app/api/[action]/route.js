@@ -104,18 +104,13 @@ export async function GET(req,ctx){
   const[statsResult,visitorsResult,cheersResult,questionsResult]=await Promise.all([
    client.rpc("daeil_admin_stats"),
    client.from("visitors").select("visitor_id,nickname,blocked,block_reason,created_at,last_seen").order("last_seen",{ascending:false}).limit(500),
-   client.from("cheers").select("visitor_id,emoji").not("visitor_id","is",null).limit(10000),
    client.from("questions").select("id,nickname,visitor_id,body,answer,status,created_at,answered_at").order("created_at",{ascending:false}).limit(500)
   ]);
-  if(statsResult.error||visitorsResult.error||cheersResult.error||questionsResult.error){
+  if(statsResult.error||visitorsResult.error||questionsResult.error){
    return NextResponse.json({error:"관리자 통계를 불러오지 못했어요. supabase/migrations/20261112_admin_moderation.sql을 실행했는지 확인해 주세요."},{status:500});
   }
-  const byVisitor={};
-  for(const row of cheersResult.data||[]){
-   if(!row.visitor_id)continue;
-   byVisitor[row.visitor_id]=(byVisitor[row.visitor_id]||0)+1;
-  }
-  const visitors=(visitorsResult.data||[]).map(v=>({...v,cheer_count:byVisitor[v.visitor_id]||0}));
+  const byVisitor=statsResult.data?.cheers_by_visitor||{};
+  const visitors=(visitorsResult.data||[]).map(v=>({...v,cheer_count:Number(byVisitor[v.visitor_id]||0)}));
   return NextResponse.json({
    stats:statsResult.data||{},
    visitors,
