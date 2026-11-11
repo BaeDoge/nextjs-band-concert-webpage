@@ -8,11 +8,10 @@
       ]
     },
     {
-      "source": "/images/activity-gallery.svg.gz",
+      "source": "/images/activity-gallery.webp",
       "headers": [
-        { "key": "Content-Type", "value": "image/svg+xml; charset=utf-8" },
-        { "key": "Content-Encoding", "value": "gzip" },
-        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
+        { "key": "Content-Type", "value": "image/webp" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
     }
   ]
