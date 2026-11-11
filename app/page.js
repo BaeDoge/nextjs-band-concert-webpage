@@ -32,7 +32,7 @@ function Countdown() {
   return <div className="countdown">{(time||[0,0,0,0]).map((v,i)=><div key={i}><b>{String(v).padStart(2,"0")}</b><small>{["DAYS","HOURS","MINS","SECS"][i]}</small></div>)}</div>;
 }
 function Cat({className=""}) {
-  return <div className={"cat-wrap "+className}><img src="/images/guitar-cat.png" alt="헤드폰을 쓰고 기타를 연주하는 오렌지색 고양이" onError={e=>{e.currentTarget.style.display="none";if(e.currentTarget.nextElementSibling)e.currentTarget.nextElementSibling.style.display="block";}}/><span className="cat-fallback">🐈🎸</span><i>✳</i><b>✦</b></div>;
+  return <div className={"cat-wrap "+className}><img src="/images/guitar-cat.webp" alt="헤드폰을 쓰고 기타를 연주하는 오렌지색 고양이" onError={e=>{e.currentTarget.style.display="none";if(e.currentTarget.nextElementSibling)e.currentTarget.nextElementSibling.style.display="block";}}/><span className="cat-fallback">🐈🎸</span><i>✳</i><b>✦</b></div>;
 }
 
 export default function Home() {
