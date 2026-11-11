@@ -5,7 +5,7 @@ export const metadata = {
   title: "대일밴드 공연 | 2026.11.21",
   description: "2026년 11월 21일 목동 제이에스아트홀에서 만나요. 대일밴드 공연 안내, 셋리스트, 멤버, 응원과 메시지.",
   alternates: { canonical: "/" },
-  icons: { icon: "/images/cat-headphones.svg", shortcut: "/images/cat-headphones.svg" },
+  icons: { icon: "/images/cat-headphones.svg.gz", shortcut: "/images/cat-headphones.svg.gz" },
   openGraph: {
     title: "대일밴드 공연 | 2026.11.21",
     description: "11월 21일 토요일 오후 6시, 목동 제이에스아트홀",
