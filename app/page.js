@@ -276,6 +276,7 @@ export default function Home() {
       <div className="kicker"><span>03 / SCHEDULE</span><span>SHOW TIMELINE</span></div>
       <div className="schedule-head"><h2>SHOW<br/><em>SCHEDULE.</em></h2><div className="calendar"><CalendarDays/><b>21</b><span>NOV / SAT</span><small>2026</small></div></div>
       <div className="timeline">
+        <p className="schedule-seating-note">관객 수에 따라 스탠딩 또는 좌석 운영으로 변경될 수 있습니다.</p>
         <div className="time-row active"><b>18:00</b><i/><div><small>1부</small><h3>대일밴드 공연 시작</h3><p>대일밴드의 첫 번째 무대입니다.</p></div><span>90분</span></div>
         <div className="time-row"><b>19:30</b><i/><div><small>2부</small><h3>2부 공연 시작</h3><p>이어지는 무대도 함께 즐겨주세요.</p></div><span>90분</span></div>
         <div className="time-row"><b>21:00</b><i/><div><small>전체 행사</small><h3>전체 행사 마무리</h3><p>아쉬움은 뒤풀이에서 이어가요.</p></div><span>종료</span></div>
@@ -308,7 +309,7 @@ export default function Home() {
       <Reveal className="rsvp-card" delay={.1}><h3>뒤풀이에 참석하시나요?</h3><div className="choices">{[["yes","🙌","참석할게요"],["maybe","🤔","아직 모르겠어요"],["no","🥲","아쉽지만 불참"]].map(([v,em,t])=><button type="button" key={v} className={attendance===v?"chosen":""} onClick={()=>setAttendance(v)}><span>{em}</span>{t}{attendance===v&&<Check size={15}/>}</button>)}</div>{attendance==="yes"&&<label className="guest-number">참석 인원<select value={people} onChange={e=>setPeople(e.target.value)}>{[1,2,3,4,5,6].map(n=><option key={n}>{n}</option>)}</select></label>}<label className="message-label" htmlFor="after-message">남기고 싶은 말</label><input id="after-message" value={afterMessage} onChange={e=>setAfterMessage(e.target.value)} maxLength={100} placeholder="예: 늦게 합류할게요!"/><button className="send-rsvp" onClick={rsvp}>참석 여부 보내기 <ArrowUpRight size={16}/></button>{rsvpInfo&&<p className="feedback">{rsvpInfo}</p>}</Reveal></div>
     </section>
 
-    <section className="section qr-section"><Reveal className="qr-card"><div><p className="eyebrow orange">공연 페이지 공유</p><h2>대일밴드<br/><em>공연에서 만나요.</em></h2><p>친구에게 페이지를 공유하고<br/>공연 당일 함께해 주세요.</p><button type="button" className="share-button" onClick={sharePage}><Share2 size={16}/> 공유하기</button>{shareMessage&&<p className="share-message" role="status">{shareMessage}</p>}</div><div className="qr-code"><QRCodeSVG value={siteUrl} size={150} bgColor="#f6f0e7" fgColor="#191715" level="H"/><small>QR 코드로 접속</small></div></Reveal><Reveal className="last-cat"><Cat/></Reveal></section>
+    <section className="section qr-section"><Reveal className="qr-card"><div><p className="eyebrow orange">공연 페이지 공유</p><h2>대일밴드<br/><em>공연에서 만나요.</em></h2><p className="share-invite-copy">친구에게 페이지를 공유하고<br/>공연 당일 함께해 주세요.</p><button type="button" className="share-button" onClick={sharePage}><Share2 size={16}/> 공유하기</button>{shareMessage&&<p className="share-message" role="status">{shareMessage}</p>}</div><div className="qr-code"><QRCodeSVG value={siteUrl} size={150} bgColor="#f6f0e7" fgColor="#191715" level="H"/><small>QR 코드로 접속</small></div></Reveal><Reveal className="last-cat"><Cat/></Reveal></section>
 
     {galleryEnabled&&<section className="activity-gallery-section" aria-label="대일밴드 활동 사진 모음">
       <Reveal className="activity-gallery" delay={.08}>
