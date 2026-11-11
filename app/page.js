@@ -41,6 +41,10 @@ export default function Home() {
   const [welcome,setWelcome]=useState(false);
   const [ready,setReady]=useState(false);
   const [checked,setChecked]=useState(false);
+  const [setupMessage,setSetupMessage]=useState("");
+  const [cheerMessage,setCheerMessage]=useState("");
+  const [shareMessage,setShareMessage]=useState("");
+  const seenCheerIds=useRef(new Set());
   const [cheers,setCheers]=useState([]);
   const [cheerCount,setCheerCount]=useState(0);
   const [floating,setFloating]=useState([]);
@@ -60,22 +64,77 @@ export default function Home() {
     const saved=localStorage.getItem("band-night-name");
     if(saved)setNickname(saved);
     else{const n=randomName();setNickname(n);setDraft(n);setWelcome(true);}
-    setSiteUrl(location.origin);
-    fetch("/api/status").then(r=>r.json()).then(d=>{setReady(!!d.configured);setChecked(true);}).catch(()=>setChecked(true));
-    fetch("/api/cheers").then(r=>r.ok?r.json():null).then(d=>{if(d){setCheers(d.items||[]);setCheerCount(d.total||0);}}).catch(()=>{});
-    fetch("/api/rsvp").then(r=>r.ok?r.json():null).then(d=>{if(d?.summary)setSummary(d.summary);}).catch(()=>{});
-    const refresh = () => { fetch("/api/cheers").then(r=>r.ok?r.json():null).then(d=>{if(d){setCheers(d.items||[]);setCheerCount(d.total||0);}}).catch(()=>{}); fetch("/api/rsvp").then(r=>r.ok?r.json():null).then(d=>{if(d?.summary)setSummary(d.summary);}).catch(()=>{}); };
-    const poll = window.setInterval(refresh, 7000);
-    return () => window.clearInterval(poll);
+
+    let active=true;
+    let initialSnapshotLoaded=false;
+    const loadStatus=async()=>{
+      try{
+        const response=await fetch("/api/status",{cache:"no-store"});
+        const data=await response.json();
+        if(!active)return;
+        setReady(Boolean(data.configured));
+        setSetupMessage(data.message||"");
+        setChecked(true);
+      }catch{
+        if(active){setReady(false);setSetupMessage("서버 상태를 확인하지 못했어요. 잠시 후 다시 접속해 주세요.");setChecked(true);}
+      }
+    };
+    const refreshCheers=async()=>{
+      try{
+        const response=await fetch("/api/cheers",{cache:"no-store"});
+        if(!response.ok)throw new Error("응원 기록을 불러오지 못했어요.");
+        const data=await response.json();
+        if(!active)return;
+        const items=data.items||[];
+        const fresh=initialSnapshotLoaded?items.filter(item=>item.id&&!seenCheerIds.current.has(item.id)):[];
+        items.forEach(item=>{if(item.id)seenCheerIds.current.add(item.id);});
+        setCheers(items);
+        setCheerCount(Number(data.total||0));
+        if(fresh.length){
+          const effects=fresh.map((item,index)=>({id:item.id,emoji:item.emoji,nickname:item.nickname||"익명의 관객",x:12+((index*19+Math.random()*16)%76)}));
+          setFloating(current=>[...effects,...current].slice(0,24));
+          effects.forEach(item=>window.setTimeout(()=>setFloating(current=>current.filter(value=>value.id!==item.id)),2400));
+        }
+      }catch{
+        if(active&&initialSnapshotLoaded)setCheerMessage("응원 기록을 서버에서 불러오지 못했어요.");
+      }
+    };
+    const refreshRsvp=async()=>{
+      try{const response=await fetch("/api/rsvp",{cache:"no-store"});if(!response.ok)return;const data=await response.json();if(active&&data.summary)setSummary(data.summary);}catch{}
+    };
+    loadStatus();
+    refreshCheers().then(()=>{initialSnapshotLoaded=true;});
+    refreshRsvp();
+    const poll=window.setInterval(()=>{refreshCheers();refreshRsvp();},3000);
+    return()=>{active=false;window.clearInterval(poll);};
   },[]);
 
   const saveName=e=>{e.preventDefault();const n=draft.trim().slice(0,14)||randomName();localStorage.setItem("band-night-name",n);setNickname(n);setWelcome(false);};
   const cheer=async emoji=>{
-    const id=Date.now()+"-"+Math.random();
-    setFloating(a=>[...a,{id,emoji,x:15+Math.random()*70}]);
-    setTimeout(()=>setFloating(a=>a.filter(v=>v.id!==id)),1900);
-    setCheerCount(n=>n+1);setCheers(a=>[{id,nickname,emoji},...a].slice(0,8));
-    if(ready){try{const r=await fetch("/api/cheers",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nickname,emoji})});if(!r.ok)throw Error();}catch{setReady(false);}}
+    playCheerSound();
+    if(!ready){setCheerMessage(setupMessage||"응원 저장 서버가 연결되지 않았어요.");return;}
+    setCheerMessage("");
+    try{
+      const response=await fetch("/api/cheers",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nickname:nickname||"익명의 관객",emoji})});
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error||"응원을 저장하지 못했어요.");
+      const item=data.item;
+      if(item?.id){
+        seenCheerIds.current.add(item.id);
+        setCheers(current=>[item,...current.filter(value=>value.id!==item.id)].slice(0,30));
+        setFloating(current=>[{id:item.id,emoji:item.emoji,nickname:item.nickname||nickname,x:22+Math.random()*56},...current].slice(0,24));
+        window.setTimeout(()=>setFloating(current=>current.filter(value=>value.id!==item.id)),2400);
+      }
+      setCheerCount(count=>count+1);
+    }catch(error){setCheerMessage(error.message||"응원을 저장하지 못했어요.");}
+  };
+  const sharePage=async()=>{
+    const shareData={title:"대일밴드 공연 안내",text:"2026년 11월 21일, 대일밴드 공연에서 만나요!",url:siteUrl};
+    try{
+      if(navigator.share){await navigator.share(shareData);setShareMessage("공유 메뉴를 열었어요.");}
+      else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(siteUrl);setShareMessage("공연 페이지 주소를 복사했어요.");}
+      else setShareMessage(siteUrl);
+    }catch(error){if(error.name!=="AbortError")setShareMessage("공유에 실패했어요. QR 코드를 이용해 주세요.");}
   };
   const ask=async e=>{
     e.preventDefault();if(!question.trim())return;
