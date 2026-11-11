@@ -224,7 +224,7 @@ export default function Home() {
 
   return <><main className="shell">
     <motion.div className="progress" style={{scaleX:progress}}/>
-    <nav className="nav"><a className="logo cat-logo" href="#top" aria-label="대일밴드 처음으로"><img src="/images/cat-headphones.svg" alt="대일밴드 고양이 로고"/></a><div><a href="#about">소개</a><a href="#setlist">셋리스트</a><a href="#members">멤버</a><a href="#cheer">응원</a></div><a className="nav-cta" href="#questions">메시지 보내기 ↗</a></nav>
+    <nav className="nav"><a className="logo cat-logo" href="#top" aria-label="대일밴드 처음으로"><img src="/images/cat-headphones.svg.gz" alt="대일밴드 고양이 로고"/></a><div><a href="#about">소개</a><a href="#setlist">셋리스트</a><a href="#members">멤버</a><a href="#cheer">응원</a></div><a className="nav-cta" href="#questions">메시지 보내기 ↗</a></nav>
 
     <section className="hero" id="top">
       <div className="hero-grain"/>
