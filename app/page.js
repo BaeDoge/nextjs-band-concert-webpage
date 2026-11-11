@@ -233,7 +233,6 @@ export default function Home() {
       <div className="kicker inverse"><span>05 / CHEER</span><span>SEND SOME LOVE</span></div>
       <div className="cheer-grid"><Reveal><p className="eyebrow">대일밴드에게 보내는 응원</p><h2>응원으로<br/><em>함께해요.</em></h2><p className="body-copy">응원 버튼을 누르면 다른 관객에게도<br/>닉네임과 함께 응원 애니메이션이 보여요.</p></Reveal>
       <Reveal className="cheer-box" delay={.12}><div className="cheer-count"><b>{cheerCount.toLocaleString("ko-KR")}</b><small>누적 응원</small></div><div className="reaction-grid">{reactions.map(([emoji,label])=><button type="button" aria-label={label} key={emoji} onClick={()=>cheer(emoji)}><b>{emoji}</b></button>)}</div><p className="cheer-message" role="status">{cheerMessage}</p><div className="cheer-wall"><div><span>최근 도착한 응원</span><b><i/> 실시간</b></div><section>{cheers.slice(0,6).map((item,i)=><span key={item.id||i}>{item.emoji} <small>{item.nickname||"익명의 관객"}</small></span>)}{!cheers.length&&<small>첫 응원을 남겨주세요.</small>}</section></div></Reveal></div>
-      <AnimatePresence>{floating.map(f=><motion.div className="float-cheer" key={f.id} style={{left:f.x+"%"}} initial={{opacity:0,y:25,scale:.55}} animate={{opacity:[0,1,1,0],y:-250,scale:[.6,1.15,1],rotate:8}} exit={{opacity:0}} transition={{duration:2.35}}><b>{f.emoji}</b><small>{f.nickname}</small></motion.div>)}</AnimatePresence>
     </section>
 
     <section className="section questions" id="questions">
