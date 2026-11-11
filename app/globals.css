@@ -20,3 +20,91 @@ footer{background:#11100f;color:white;padding:34px clamp(22px,8vw,120px) 24px}.f
 @media(max-width:800px){.hero{min-height:100svh;padding:100px 22px 24px}.nav>div{gap:15px}.nav>div a{font-size:8px}.nav-cta{padding:9px 11px;font-size:8px}.hero-title{margin-top:60px}.hero h1{font-size:clamp(76px,17vw,130px)}.stage{height:315px;margin-top:20px}.video-window{width:190px;height:270px}.sticker{width:54px;height:54px;font-size:8px}.hero-sub{flex-direction:column;gap:8px;margin-top:22px}.hero-bottom{gap:12px}.hero-day>b{font-size:40px}.hero-day span,.hero-hours{font-size:8px}.hero-hours span{font-size:7px}.hero-bottom>a{font-size:7px;gap:5px}.section{padding:78px 25px}.intro-grid{grid-template-columns:1fr;gap:25px;padding:58px 0 35px}.intro h2{font-size:42px}.cat-stage{height:340px}.intro-cat{height:300px}.intro-cat img{max-height:300px}.orbit{width:260px;height:260px}.orbit.two{width:300px;height:180px}.count-panel{padding:22px 17px;flex-direction:column;align-items:flex-start;gap:21px}.countdown{width:100%;justify-content:space-between}.countdown>div{min-width:0}.set-head{padding:58px 0 37px}.set-head h2{font-size:65px}.set-aside p{font-size:10px}.song{grid-template-columns:35px 1fr minmax(100px,.6fr) 13px;gap:8px;min-height:60px}.song>b{font-size:13px}.song>small{font-size:10px}.schedule-head{padding:57px 0 42px}.schedule-head h2{font-size:51px}.calendar{width:88px;height:112px}.calendar b{font-size:37px}.time-row{grid-template-columns:58px 15px 1fr 32px;gap:10px;min-height:110px}.time-row>b{font-size:12px}.time-row h3{font-size:14px}.time-row p{font-size:10px}.time-row div>small{font-size:8px}.time-row>span{font-size:8px}.venue{padding:18px;gap:12px}.venue section b{font-size:14px}.venue section p{font-size:10px}.venue>span{font-size:7px}.members-head{padding:58px 0 36px;display:block}.members-head h2{font-size:61px}.members-head p{font-size:11px;margin-top:25px}.member-grid{grid-template-columns:repeat(2,1fr);gap:9px}.member-card,.member-3,.member-4{grid-column:auto;min-height:225px;padding:18px 14px}.member-4{grid-column:1/span 2;min-height:195px}.member-card h3{font-size:21px}.member-card>div:nth-child(4){gap:5px}.member-card>div:nth-child(4) span{font-size:10px;padding:5px 8px}.miss{padding:16px;gap:12px}.miss p{font-size:10px;max-width:220px}.miss>strong{width:46px;height:46px;font-size:8px}.cheer-grid{grid-template-columns:1fr;gap:37px;padding:59px 0 20px}.cheer-grid h2{font-size:58px}.cheer-grid .body-copy{margin-top:19px}.cheer-box{padding:19px}.cheer-count b{font-size:39px}.reaction-grid button{min-height:78px}.question-grid{grid-template-columns:1fr;gap:36px;padding-top:58px}.question-grid h2{font-size:55px}.question-card{padding:23px 19px}.question-card textarea{min-height:120px}.after-grid{grid-template-columns:1fr;gap:40px;padding-top:58px}.after-grid h2{font-size:65px}.stats{margin-top:30px;gap:25px}.rsvp-card{padding:23px 20px}.qr-card{padding:27px 22px;gap:15px}.qr-code{padding:10px}.qr-code svg{width:126px;height:126px}.qr-card h2{font-size:55px}.qr-card p{font-size:10px}.last-cat .cat-wrap{width:66px;height:72px}.last-cat .cat-wrap img{max-height:72px}.footer-top p{display:none}.footer-bottom{font-size:7px}.preview{left:8px;bottom:8px;padding:7px 8px;font-size:7px}.preview span{display:none}.nickname{right:8px;bottom:8px;font-size:9px;padding:7px 10px}}
 @media(max-width:420px){.nav>div{gap:9px}.nav>div a{font-size:7px}.nav-cta{font-size:7px}.hero-overline{font-size:8px}.hero h1{font-size:72px}.hero-day>b{font-size:35px}.hero-bottom>a{max-width:75px;line-height:1.4}.hero-hours span{max-width:90px;text-align:right}.song{grid-template-columns:29px 1fr 100px 10px}.song>b{font-size:12px}.song>small{font-size:9px}.qr-card{align-items:flex-start}.qr-code svg{width:105px;height:105px}.qr-code>small{font-size:6px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+
+/* Daeil Band refinements */
+.cat-logo{display:flex;align-items:center;justify-content:center;width:46px;height:46px;letter-spacing:0}
+.cat-logo img{display:block;width:42px;height:42px;object-fit:contain}
+.nav .cat-logo{width:46px;height:46px}
+.footer-top .cat-logo img{width:42px;height:42px}
+.kicker{font-size:12px}
+.eyebrow{font-size:12px}
+.hero-overline{font-size:11px}
+.hero-sub{font-size:14px}
+.hero-day span,.hero-hours,.hero-hours span{font-size:10px}
+.nav>div{font-size:11px}
+.nav>div a{font-size:11px}
+.nav-cta{font-size:11px}
+.count-panel small,.countdown small{font-size:10px}
+.countdown small{letter-spacing:.03em}
+.song>small{font-size:13px}
+.song-number{font-size:12px}
+.song-note{font-size:12px}
+.time-row div>small{font-size:11px}
+.time-row>span{font-size:10px}
+.member-top{font-size:11px}
+.member-card>div:nth-child(4) span{font-size:12px}
+.member-note{font-size:12px;line-height:1.6;color:#8c7767;margin:12px 0 0}
+.cheer-count small{font-size:11px}
+.reaction-grid button{min-height:88px}
+.cheer-message{min-height:0;margin:0;color:#ff9a75;font-size:11px;line-height:1.6}
+.cheer-wall>div,.cheer-wall>div b{font-size:11px}
+.cheer-wall>section small{font-size:11px}
+.float-cheer{position:absolute;bottom:4%;z-index:4;display:flex;align-items:center;gap:8px;padding:8px 13px;border:1px solid rgba(255,255,255,.2);border-radius:28px;background:rgba(246,240,231,.95);color:#211815;box-shadow:0 8px 24px rgba(0,0,0,.2);pointer-events:none;white-space:nowrap}
+.float-cheer>b{font-size:25px}
+.float-cheer>small{font-size:11px;font-weight:700;color:#5c5149}
+.question-card .form-top{font-size:11px}
+.form-actions small{font-size:11px}
+.qr-card>div:first-child>small{font-size:11px}
+.share-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:15px;padding:12px 17px;border:0;border-radius:4px;background:var(--orange);color:#211815;font-size:12px;font-weight:700}
+.share-button:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.share-message{font-size:11px;color:#8a5945;margin:9px 0 0}
+.footer-top p{font-size:11px}
+.footer-bottom{font-size:10px}
+.preview{font:10px var(--body);letter-spacing:0;max-width:min(560px,calc(100vw - 30px))}
+.preview span{font-size:11px;line-height:1.4}
+.host header>small{font-size:12px}
+.host-login label,.host-list-head{font-size:13px}
+.host-login button{font-size:12px}
+.host-cheers{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:#eee5d8;padding:20px 22px;margin:0 0 30px}
+.host-cheers>div{display:grid;grid-template-columns:24px auto;column-gap:10px;align-items:center;flex:1;min-width:165px}
+.host-cheers>div svg{grid-row:span 2;color:var(--orange)}
+.host-cheers>div span{font-size:12px;color:#766c62}
+.host-cheers>div strong{font:800 30px var(--display);letter-spacing:-.06em}
+.host-reset{display:inline-flex;align-items:center;gap:7px;border:0;border-radius:3px;padding:11px 13px;background:#271f1b;color:white;font-size:11px}
+.host-reset:disabled{opacity:.4;cursor:not-allowed}
+.host-cheers>p{width:100%;font-size:11px;color:#8a8076;margin:0}
+.host-list-head b{font-size:14px}
+.host-list-head button{display:inline-flex;align-items:center;gap:6px;font-size:11px}
+.host-empty{font-size:12px;color:#8e8378}
+.host-list article>div{font-size:11px}
+.host-list article>p{font-size:14px}
+.host-list article section input{font-size:12px}
+.host-list article section button{font-size:11px}
+.host-note,.host-error,.host-notice{font-size:12px}
+.host-notice{color:#397b56}
+.cat-label{font-size:11px}
+@media(max-width:800px){
+ .cat-logo,.nav .cat-logo{width:40px;height:40px}
+ .cat-logo img,.footer-top .cat-logo img{width:38px;height:38px}
+ .nav>div a{font-size:10px}
+ .nav-cta{font-size:10px;padding:9px 10px}
+ .kicker{font-size:10px}
+ .eyebrow{font-size:11px}
+ .hero-overline{font-size:9px}
+ .hero-sub{font-size:13px}
+ .song>small{font-size:11px}
+ .song-number{font-size:11px}
+ .song-note{font-size:11px}
+ .time-row div>small{font-size:10px}
+ .member-top{font-size:10px}
+ .member-card>div:nth-child(4) span{font-size:11px}
+ .member-3,.member-4,.member-5{grid-column:auto;min-height:225px}
+ .member-note{font-size:11px}
+ .float-cheer{padding:6px 10px;gap:6px}
+ .float-cheer>b{font-size:21px}
+ .float-cheer>small{font-size:10px}
+ .preview{bottom:50px;max-width:calc(100vw - 16px)}
+ .host-cheers{gap:12px;padding:16px}
+ .host-reset{font-size:10px}
+}
