@@ -309,7 +309,17 @@ export default function Home() {
 
     <section className="section qr-section"><Reveal className="qr-card"><div><p className="eyebrow orange">공연 페이지 공유</p><h2>대일밴드<br/><em>공연에서 만나요.</em></h2><p>친구에게 페이지를 공유하고<br/>공연 당일 함께해 주세요.</p><button type="button" className="share-button" onClick={sharePage}><Share2 size={16}/> 공유하기</button>{shareMessage&&<p className="share-message" role="status">{shareMessage}</p>}</div><div className="qr-code"><QRCodeSVG value={siteUrl} size={150} bgColor="#f6f0e7" fgColor="#191715" level="H"/><small>QR 코드로 접속</small></div></Reveal><Reveal className="last-cat"><Cat/></Reveal></section>
 
-    {galleryEnabled&&<section className="activity-gallery-section" aria-label="대일밴드 활동 사진 모음">{gallery}</section>}
+    {galleryEnabled&&<section className="activity-gallery-section" aria-label="대일밴드 활동 사진 모음">
+      <Reveal className="activity-gallery" delay={.08}>
+        <div className="activity-gallery-heading"><span>DAEIL BAND ARCHIVE</span><b>함께한 순간들</b></div>
+        <div className="activity-marquee" onContextMenu={event=>event.preventDefault()} aria-label="대일밴드 활동 사진">
+          <div className="activity-marquee-track">
+            <img src="/images/activity-gallery.svg" alt="대일밴드 활동 사진 모음" draggable={false} onDragStart={event=>event.preventDefault()}/>
+            <img src="/images/activity-gallery.svg" alt="" aria-hidden="true" draggable={false} onDragStart={event=>event.preventDefault()}/>
+          </div>
+        </div>
+      </Reveal>
+    </section>}
 
     <footer><div className="footer-top"><a className="logo cat-logo" href="#top"><img src="/images/cat-headphones.svg" alt="대일밴드 고양이 로고"/></a><p>대일밴드와 함께해 주셔서 감사합니다.</p><a href="#top">맨 위로 ↑</a></div><div className="footer-bottom"><span>© 2026 DAEIL BAND <i>·</i> 배승호 Bae Seung Ho</span><span>2026.11.21 · 18:00 — 21:00</span></div></footer>
     <div className="sticky-rsvp"><a href="#rsvp">뒤풀이 참석 여부 보내기 ↗</a></div>
