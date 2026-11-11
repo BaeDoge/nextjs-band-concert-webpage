@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
 import { ArrowDown, ArrowUpRight, CalendarDays, Check, MapPin, MessageCircle, Music2, Send, X, QrCode, Share2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
@@ -49,7 +49,7 @@ function Countdown() {
     const tick=()=>{const d=Math.max(0,target-Date.now());setTime([Math.floor(d/86400000),Math.floor(d%86400000/3600000),Math.floor(d%3600000/60000),Math.floor(d%60000/1000)]);};
     tick();const id=setInterval(tick,1000);return()=>clearInterval(id);
   },[]);
-  return <div className="countdown">{(time||[0,0,0,0]).map((v,i)=><div key={i}><b>{String(v).padStart(2,"0")}</b><small>{["DAYS","HOURS","MINS","SECS"][i]}</small></div>)}</div>;
+  return <div className="countdown">{(time||[0,0,0,0]).map((v,i)=><div key={i}><b>{String(v).padStart(2,"0")}</b><small>{["일","시간","분","초"][i]}</small></div>)}</div>;
 }
 function Cat({className=""}) {
   return <div className={"cat-wrap "+className}><img src="/images/guitar-cat.webp" alt="헤드폰을 쓰고 기타를 연주하는 오렌지색 고양이" onError={e=>{e.currentTarget.style.display="none";if(e.currentTarget.nextElementSibling)e.currentTarget.nextElementSibling.style.display="block";}}/><span className="cat-fallback">🐈🎸</span><i>✳</i><b>✦</b></div>;
@@ -158,9 +158,9 @@ export default function Home() {
   };
   const ask=async e=>{
     e.preventDefault();if(!question.trim())return;
-    if(!ready){setQuestionInfo("질문함 서버가 아직 연결되지 않았어요. Supabase 연결 후 전송할 수 있어요.");return;}
+    if(!ready){setQuestionInfo("메시지 전송 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.");return;}
     setQuestionInfo("전송 중...");
-    try{const r=await fetch("/api/questions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body:question.trim()})});const d=await r.json();if(!r.ok)throw Error(d.error);setQuestion("");setQuestionInfo("승호에게 익명으로 전달했어요. 공연 중 확인할게요!");}
+    try{const r=await fetch("/api/questions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body:question.trim()})});const d=await r.json();if(!r.ok)throw Error(d.error);setQuestion("");setQuestionInfo("익명 메시지를 전달했어요. 고마워요!");}
     catch(e){setQuestionInfo(e.message||"전송에 실패했어요.");}
   };
   const rsvp=async e=>{
@@ -169,7 +169,6 @@ export default function Home() {
     try{const r=await fetch("/api/rsvp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({visitorId,nickname,attendance,headcount:attendance==="yes"?Number(people):0,message:afterMessage.trim()})});const d=await r.json();if(!r.ok)throw Error(d.error);setRsvpInfo("참석 응답을 저장했어요. 고마워요!");if(d.summary)setSummary(d.summary);}
     catch(e){setRsvpInfo(e.message||"저장에 실패했어요.");}
   };
-  const dayLabel=useMemo(()=>"2026. 11. 21 (SAT)",[]);
 
   return <main className="shell">
     <motion.div className="progress" style={{scaleX:progress}}/>
