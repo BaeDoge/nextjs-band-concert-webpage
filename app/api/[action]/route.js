@@ -67,6 +67,12 @@ export async function GET(req,ctx){
  }
  if(!client)return missing();
 
+ if(action==="gallery"){
+  const{data,error}=await client.from("site_settings").select("gallery_enabled").eq("id",1).maybeSingle();
+  if(error)return jsonError("활동사진 설정을 불러오지 못했어요.");
+  return NextResponse.json({enabled:data?.gallery_enabled??true});
+ }
+
  if(action==="live"){
   const[{data,error},{count,countError}]=await Promise.all([
    client.from("cheers").select("id,nickname,emoji,created_at").order("created_at",{ascending:false}).limit(30),
@@ -101,12 +107,14 @@ export async function GET(req,ctx){
 
  if(action==="admin"){
   if(!admin(req))return jsonError("운영자 인증이 필요해요.",401);
-  const[statsResult,visitorsResult,questionsResult]=await Promise.all([
+  const[statsResult,visitorsResult,questionsResult,rsvpsResult,settingsResult]=await Promise.all([
    client.rpc("daeil_admin_stats"),
    client.from("visitors").select("visitor_id,nickname,blocked,block_reason,created_at,last_seen").order("last_seen",{ascending:false}).limit(500),
-   client.from("questions").select("id,nickname,visitor_id,body,answer,status,created_at,answered_at").order("created_at",{ascending:false}).limit(500)
+   client.from("questions").select("id,nickname,visitor_id,body,answer,status,created_at,answered_at").order("created_at",{ascending:false}).limit(500),
+   client.from("rsvps").select("visitor_id,nickname,attendance,headcount,message,updated_at").order("updated_at",{ascending:false}).limit(500),
+   client.from("site_settings").select("gallery_enabled").eq("id",1).maybeSingle()
   ]);
-  if(statsResult.error||visitorsResult.error||questionsResult.error){
+  if(statsResult.error||visitorsResult.error||questionsResult.error||rsvpsResult.error||settingsResult.error){
    return NextResponse.json({error:"관리자 통계를 불러오지 못했어요. supabase/migrations/20261112_admin_moderation.sql을 실행했는지 확인해 주세요."},{status:500});
   }
   const byVisitor=statsResult.data?.cheers_by_visitor||{};
@@ -114,7 +122,9 @@ export async function GET(req,ctx){
   return NextResponse.json({
    stats:statsResult.data||{},
    visitors,
-   messages:questionsResult.data||[]
+   messages:questionsResult.data||[],
+   rsvps:rsvpsResult.data||[],
+   settings:{gallery_enabled:settingsResult.data?.gallery_enabled??true}
   });
  }
  return jsonError("Not found",404);
@@ -220,6 +230,15 @@ export async function PATCH(req,ctx){
    if(!data)return jsonError("사용자를 찾지 못했어요.",404);
    return NextResponse.json({ok:true,visitor:data});
   }
+  if(action==="settings"){
+   const galleryEnabled=Boolean(body.galleryEnabled);
+   const{data,error}=await client.from("site_settings")
+    .upsert({id:1,gallery_enabled:galleryEnabled,updated_at:new Date().toISOString()},{onConflict:"id"})
+    .select("id,gallery_enabled,updated_at").single();
+   if(error)return jsonError("갤러리 표시 설정을 저장하지 못했어요.");
+   return NextResponse.json({ok:true,settings:data});
+  }
+
   return jsonError("Not found",404);
  }catch{return jsonError("요청을 처리하지 못했어요.",400);}
 }
