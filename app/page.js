@@ -158,13 +158,13 @@ export default function Home() {
   };
   const ask=async e=>{
     e.preventDefault();if(!question.trim())return;
-    if(!ready){setQuestionInfo("메시지 전송 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.");return;}
+    if(!ready){setQuestionInfo(setupMessage||"메시지 전송 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.");return;}
     setQuestionInfo("전송 중...");
     try{const r=await fetch("/api/questions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body:question.trim()})});const d=await r.json();if(!r.ok)throw Error(d.error);setQuestion("");setQuestionInfo("익명 메시지를 전달했어요. 고마워요!");}
     catch(e){setQuestionInfo(e.message||"전송에 실패했어요.");}
   };
   const rsvp=async e=>{
-    e.preventDefault();if(!ready){setRsvpInfo("응답 서버가 아직 연결되지 않았어요.");return;}
+    e.preventDefault();if(!ready){setRsvpInfo(setupMessage||"응답 서버가 아직 연결되지 않았어요.");return;}
     const visitorId=localStorage.getItem("band-night-visitor")||crypto.randomUUID();localStorage.setItem("band-night-visitor",visitorId);setRsvpInfo("저장 중...");
     try{const r=await fetch("/api/rsvp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({visitorId,nickname,attendance,headcount:attendance==="yes"?Number(people):0,message:afterMessage.trim()})});const d=await r.json();if(!r.ok)throw Error(d.error);setRsvpInfo("참석 응답을 저장했어요. 고마워요!");if(d.summary)setSummary(d.summary);}
     catch(e){setRsvpInfo(e.message||"저장에 실패했어요.");}
@@ -238,7 +238,7 @@ export default function Home() {
 
     <section className="section after" id="rsvp">
       <div className="kicker inverse"><span>07 / 뒤풀이 참석</span><span>참석 여부를 알려주세요</span></div>
-      <div className="after-grid"><div><p className="eyebrow">뒤풀이 안내</p><h2>AFTER THE<br/>LAST <em>SONG.</em></h2><p className="body-copy">무대가 끝나도 우리의 밤은 끝나지 않아요.<br/>뒤풀이에 함께할 수 있는지 알려주세요!</p><div className="stats"><div><b>{summary.yes}</b><small>COMING</small></div><div><b>{summary.maybe}</b><small>UNSURE</small></div><div><b>{summary.no}</b><small>CAN'T MAKE IT</small></div></div></div>
+      <div className="after-grid"><div><p className="eyebrow">뒤풀이 안내</p><h2>공연이 끝나면<br/><em>뒤풀이에서.</em></h2><p className="body-copy">무대가 끝나도 우리의 밤은 끝나지 않아요.<br/>뒤풀이에 함께할 수 있는지 알려주세요!</p><div className="stats"><div><b>{summary.yes}</b><small>참석</small></div><div><b>{summary.maybe}</b><small>미정</small></div><div><b>{summary.no}</b><small>불참</small></div></div></div>
       <Reveal className="rsvp-card" delay={.1}><div className="form-top"><span>뒤풀이 참석 여부</span><span>응답 등록</span></div><h3>뒤풀이에 참석하시나요?</h3><div className="choices">{[["yes","🙌","참석할게요"],["maybe","🤔","아직 모르겠어요"],["no","🥲","아쉽지만 불참"]].map(([v,em,t])=><button type="button" key={v} className={attendance===v?"chosen":""} onClick={()=>setAttendance(v)}><span>{em}</span>{t}{attendance===v&&<Check size={15}/>}</button>)}</div>{attendance==="yes"&&<label className="guest-number">참석 인원<select value={people} onChange={e=>setPeople(e.target.value)}>{[1,2,3,4,5,6].map(n=><option key={n}>{n}</option>)}</select></label>}<label className="message-label" htmlFor="after-message">남기고 싶은 말 <small>선택</small></label><input id="after-message" value={afterMessage} onChange={e=>setAfterMessage(e.target.value)} maxLength={100} placeholder="예: 늦게 합류할게요!"/><button className="send-rsvp" onClick={rsvp}>참석 여부 보내기 <ArrowUpRight size={16}/></button>{rsvpInfo&&<p className="feedback">{rsvpInfo}</p>}<small className="privacy">응답은 인원 파악을 위해서만 사용해요.</small></Reveal></div>
     </section>
 
