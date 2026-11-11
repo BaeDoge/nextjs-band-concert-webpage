@@ -66,6 +66,23 @@ export default function HostPage(){
   finally{setBusy(false);}
  }
 
+ async function deleteVisitor(visitor){
+  const nickname=visitor.nickname||"관객";
+  const messageCount=messages.filter(item=>item.visitor_id===visitor.visitor_id).length;
+  const rsvpCount=rsvps.filter(item=>item.visitor_id===visitor.visitor_id).length;
+  const cheerCount=Number(visitor.cheer_count||0);
+  const summary=nickname+" 사용자를 삭제하면 연결된 기록도 함께 삭제됩니다.\\n\\n응원 "+cheerCount+"건\\n메시지 "+messageCount+"건\\n뒤풀이 응답 "+rsvpCount+"건\\n\\n이 작업은 복구할 수 없습니다. 계속할까요?";
+  if(!window.confirm(summary))return;
+  setBusy(true);setError("");setNotice("");
+  try{
+   const response=await fetch("/api/visitors",{method:"DELETE",headers:{"Content-Type":"application/json","x-admin-key":key},body:JSON.stringify({visitorId:visitor.visitor_id})});
+   const data=await response.json();
+   if(!response.ok)throw Error(data.error||"사용자를 삭제하지 못했어요.");
+   setNotice(nickname+" 및 연결된 기록을 삭제했어요.");await load();
+  }catch(e){setError(e.message||"사용자 삭제에 실패했어요.");}
+  finally{setBusy(false);}
+ }
+
  async function resetCheers(){
   if(!window.confirm("누적 응원 기록 "+Number(stats.total_cheers||0)+"건을 모두 삭제할까요? 이 작업은 되돌릴 수 없습니다."))return;
   setBusy(true);setError("");setNotice("");
@@ -118,7 +135,10 @@ export default function HostPage(){
       {filteredVisitors.length===0?<p className="host-empty">검색 결과가 없습니다.</p>:filteredVisitors.map(visitor=>
        <article className={visitor.blocked?"host-user is-blocked":"host-user"} key={visitor.visitor_id}>
         <div className="host-user-main"><strong>{visitor.nickname||"관객"}</strong><small>응원 {Number(visitor.cheer_count||0)}회 · 최근 접속 {visitor.last_seen?new Date(visitor.last_seen).toLocaleString("ko-KR"):"-"}</small>{visitor.blocked&&<em>차단됨 · {visitor.block_reason||"사유 미입력"}</em>}</div>
-        <button className={visitor.blocked?"host-unblock":"host-block"} disabled={busy} onClick={()=>toggleBlock(visitor)}>{visitor.blocked?<><ShieldCheck size={14}/> 차단 해제</>:<><ShieldBan size={14}/> 차단</>}</button>
+        <div className="host-user-actions">
+         <button className={visitor.blocked?"host-unblock":"host-block"} disabled={busy} onClick={()=>toggleBlock(visitor)}>{visitor.blocked?<><ShieldCheck size={14}/> 차단 해제</>:<><ShieldBan size={14}/> 차단</>}</button>
+         <button className="host-delete" disabled={busy} onClick={()=>deleteVisitor(visitor)}><Trash2 size={14}/> 삭제</button>
+        </div>
        </article>
       )}
      </div>
