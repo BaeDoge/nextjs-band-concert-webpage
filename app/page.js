@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
-import { ArrowDown, ArrowUpRight, CalendarDays, Check, Clock3, Guitar, MapPin, MessageCircle, Music2, Send, Sparkles, Users, X, PartyPopper, QrCode } from "lucide-react";
+import { ArrowDown, ArrowUpRight, CalendarDays, Check, MapPin, MessageCircle, Music2, Send, X, QrCode, Share2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 const songs = [
@@ -14,12 +14,12 @@ const groups = [
   ["DRUMS","드럼","🥁",["혜유","동욱","도헌"]],
   ["KEYBOARD","키보드","🎹",["지민","지호","유진","다니엘"]],
   ["BASS","베이스","🎸",["준수(임)","준수(신)","혜선"]],
-  ["VOCAL","보컬","🎤",["규홍","우성","상후","민상","성준","혜인","수연"]]
+  ["VOCAL","보컬","🎤",["규홍","우성","상후","민상","성준","혜인","수연"]],\n  ["OVERSEAS SALES","해외 영업","✈️",["다은"]]
 ];
 const reactions = [["🔥","불타오르자"],["👏","박수"],["💛","하트"],["🎸","기타"],["🐈","고양이"],["✨","반짝"]];
 const randomName = () => ["리듬타는","야광","신나는","새벽","앵콜","기타치는"][Math.floor(Math.random()*6)]+" 관객 "+Math.floor(100+Math.random()*900);
 
-function Reveal({children,className="",delay=0}) {
+function playCheerSound() {\n  try {\n    const AudioContextClass = window.AudioContext || window.webkitAudioContext;\n    if (!AudioContextClass) return;\n    const context = new AudioContextClass();\n    const oscillator = context.createOscillator();\n    const gain = context.createGain();\n    oscillator.type = "sine";\n    oscillator.frequency.setValueAtTime(520, context.currentTime);\n    oscillator.frequency.exponentialRampToValueAtTime(880, context.currentTime + 0.11);\n    gain.gain.setValueAtTime(0.0001, context.currentTime);\n    gain.gain.exponentialRampToValueAtTime(0.12, context.currentTime + 0.015);\n    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.2);\n    oscillator.connect(gain); gain.connect(context.destination);\n    oscillator.start(); oscillator.stop(context.currentTime + 0.21);\n    oscillator.onended = () => context.close();\n  } catch {}\n}\n\nfunction Reveal({children,className="",delay=0}) {
   return <motion.div className={className} initial={{opacity:0,y:32,filter:"blur(7px)"}} whileInView={{opacity:1,y:0,filter:"blur(0px)"}} viewport={{once:true,amount:.15}} transition={{duration:.8,delay,ease:[.22,1,.36,1]}}>{children}</motion.div>;
 }
 function Countdown() {
@@ -52,7 +52,7 @@ export default function Home() {
   const [rsvpInfo,setRsvpInfo]=useState("");
   const [summary,setSummary]=useState({yes:0,maybe:0,no:0});
   const [videoError,setVideoError]=useState(false);
-  const [siteUrl,setSiteUrl]=useState("https://your-project.vercel.app");
+  const siteUrl="https://daeil-band.vercel.app";
   const {scrollYProgress}=useScroll();
   const progress=useSpring(scrollYProgress,{stiffness:100,damping:30,restDelta:.001});
 
@@ -94,11 +94,11 @@ export default function Home() {
 
   return <main className="shell">
     <motion.div className="progress" style={{scaleX:progress}}/>
-    <nav className="nav"><a className="logo" href="#top">B<span>/</span>N</a><div><a href="#about">ABOUT</a><a href="#setlist">SETLIST</a><a href="#members">MEMBERS</a><a href="#cheer">CHEER</a></div><a className="nav-cta" href="#rsvp">JOIN US ↗</a></nav>
+    <nav className="nav"><a className="logo cat-logo" href="#top" aria-label="대일밴드 처음으로"><img src="/images/cat-face-placeholder.svg" alt="대일밴드 고양이 로고"/></a><div><a href="#about">소개</a><a href="#setlist">셋리스트</a><a href="#members">멤버</a><a href="#cheer">응원</a></div><a className="nav-cta" href="#questions">메시지 보내기 ↗</a></nav>
 
     <section className="hero" id="top">
       <div className="hero-grain"/>
-      <div className="hero-overline"><span>ONE NIGHT, ONE BAND</span><span>LOCATION / TO BE ANNOUNCED</span></div>
+      <div className="hero-overline"><span>DAEIL BAND</span><span>목동 제이에스아트홀</span></div>
       <div className="hero-title">
         <p className="eyebrow"><i/> LIVE PERFORMANCE INVITATION</p>
         <motion.h1 initial={{opacity:0,y:35}} animate={{opacity:1,y:0}} transition={{duration:1,ease:[.22,1,.36,1]}}>BAND<br/><em>NIGHT</em><sup>26</sup></motion.h1>
@@ -107,9 +107,9 @@ export default function Home() {
       <motion.div className="stage" initial={{opacity:0,scale:.92,y:20}} animate={{opacity:1,scale:1,y:0}} transition={{delay:.2,duration:.9}}>
         <div className="stage-halo"/>
         <div className="video-window">{!videoError?<video src="/media/concert-cat.mp4" autoPlay muted loop playsInline preload="metadata" onError={()=>setVideoError(true)} aria-label="기타를 연주하는 고양이 영상"/>:<Cat/>}<div className="video-copy"><span>THE BAND IS WARMING UP</span><b>♪ PLAY IT LOUD ♪</b></div></div>
-        <span className="sticker sticker-a">NO<br/>BAD<br/>VIBES</span><span className="sticker sticker-b">11.21<br/><b>SAT</b></span><small>A LITTLE LOUD, A LOT OF LOVE.</small>
+        <span className="sticker sticker-a">DAEIL<br/>BAND</span><span className="sticker sticker-b">11.21<br/><b>SAT</b></span>
       </motion.div>
-      <div className="hero-bottom"><div className="hero-day"><b>21</b><span>NOVEMBER<br/>SATURDAY, 2026</span></div><a href="#about">SCROLL TO EXPLORE <ArrowDown size={15}/></a><div className="hero-hours"><b>18:00 — 21:00</b><span>OUR STAGE 18:00 — 19:30</span></div></div>
+      <div className="hero-bottom"><div className="hero-day"><b>21</b><span>2026년 11월<br/>토요일</span></div><a href="#about">공연 소개 보기 <ArrowDown size={15}/></a><div className="hero-hours"><b>18:00 — 21:00</b><span>1부 대일밴드 18:00 — 19:30</span></div></div>
     </section>
 
     <section className="section intro" id="about">
@@ -118,7 +118,7 @@ export default function Home() {
         <Reveal><p className="eyebrow orange">DEAR MUSIC LOVERS,</p><h2>좋아하는 음악으로<br/><em>한 장면</em>을 만들어요.</h2><p className="body-copy">익숙한 멜로디부터 마음을 흔드는 한 곡까지.<br/>각자의 악기와 목소리로 준비한 90분을 함께 나눠요.<br/>우리가 무대 위에서 신나게 놀 수 있도록<br/>여러분은 가장 큰 목소리로 함께해 주세요.</p><p className="signature">SEE YOU IN THE CROWD <b>✳</b></p></Reveal>
         <Reveal className="cat-stage" delay={.12}><div className="orbit one"/><div className="orbit two"/><Cat className="intro-cat"/><span className="cat-label">OUR LITTLE<br/>ROCK STAR</span></Reveal>
       </div>
-      <div className="count-panel"><div><small>COUNTDOWN TO THE FIRST NOTE</small><b>THE MOMENT IS COMING.</b></div><Countdown/></div>
+      <div className="count-panel"><div><small>공연 시작까지</small><b>11월 21일 토요일 오후 6시</b></div><Countdown/></div>
     </section>
 
     <section className="section setlist" id="setlist">
@@ -156,7 +156,7 @@ export default function Home() {
     <section className="section questions">
       <div className="kicker"><span>06 / ASK THE GUITAR GUY</span><span>ANONYMOUS Q&A</span></div>
       <div className="question-grid"><div><p className="eyebrow orange">◉ SECRET MESSAGE</p><h2>궁금한 건<br/><em>승호에게.</em></h2><p className="body-copy">공연 중간중간 확인할게요.<br/>하고 싶은 말이나 질문을 익명으로 보내주세요.<br/>닉네임은 표시하지 않아도 되고,<br/>질문은 운영자 승호만 확인할 수 있어요.</p><div className="lock-note">🔒 질문은 승호만 확인할 수 있어요.</div></div>
-      <Reveal className="question-card" delay={.1}><div className="form-top"><span>MESSAGE TO SEUNGHO</span><span>NO NAME REQUIRED</span></div><div className="anon">☏ <span>ANONYMOUS</span></div><form onSubmit={ask}><label htmlFor="question">보내고 싶은 메시지</label><textarea id="question" value={question} onChange={e=>setQuestion(e.target.value)} maxLength={500} placeholder="예: 다음 곡은 어떤 곡인가요? 기타 솔로 기대할게요!" required/><div className="form-actions"><small>{question.length} / 500</small><button disabled={!question.trim()}> <Send size={14}/> 메시지 보내기</button></div></form>{questionInfo&&<p className="feedback">{questionInfo}</p>}</Reveal></div>
+      <Reveal className="question-card" delay={.1}><div className="form-top"><span>익명 메시지</span><span>이름 없이 전달</span></div><div className="anon">✉ <span>익명 메시지</span></div><form onSubmit={ask}><label htmlFor="question">보내고 싶은 메시지</label><textarea id="question" value={question} onChange={e=>setQuestion(e.target.value)} maxLength={500} placeholder="예: 다음 곡은 어떤 곡인가요? 기타 솔로 기대할게요!" required/><div className="form-actions"><small>{question.length} / 500</small><button disabled={!question.trim()}> <Send size={14}/> 메시지 보내기</button></div></form>{questionInfo&&<p className="feedback">{questionInfo}</p>}</Reveal></div>
     </section>
 
     <section className="section after" id="rsvp">
@@ -165,13 +165,13 @@ export default function Home() {
       <Reveal className="rsvp-card" delay={.1}><div className="form-top"><span>AFTER PARTY RSVP</span><span>01 / 01</span></div><h3>뒤풀이에 참석하시나요?</h3><div className="choices">{[["yes","🙌","참석할게요"],["maybe","🤔","아직 모르겠어요"],["no","🥲","아쉽지만 불참"]].map(([v,em,t])=><button type="button" key={v} className={attendance===v?"chosen":""} onClick={()=>setAttendance(v)}><span>{em}</span>{t}{attendance===v&&<Check size={15}/>}</button>)}</div>{attendance==="yes"&&<label className="guest-number">참석 인원<select value={people} onChange={e=>setPeople(e.target.value)}>{[1,2,3,4,5,6].map(n=><option key={n}>{n}</option>)}</select></label>}<label className="message-label" htmlFor="after-message">남기고 싶은 말 <small>선택</small></label><input id="after-message" value={afterMessage} onChange={e=>setAfterMessage(e.target.value)} maxLength={100} placeholder="예: 늦게 합류할게요!"/><button className="send-rsvp" onClick={rsvp}>참석 여부 보내기 <ArrowUpRight size={16}/></button>{rsvpInfo&&<p className="feedback">{rsvpInfo}</p>}<small className="privacy">응답은 인원 파악을 위해서만 사용해요.</small></Reveal></div>
     </section>
 
-    <section className="section qr-section"><Reveal className="qr-card"><div><p className="eyebrow orange">▦ SAVE & SHARE</p><h2>SEE YOU<br/><em>THERE.</em></h2><p>이 페이지를 친구에게 공유하고<br/>공연 당일 QR로 바로 접속하세요.</p><small>{siteUrl}</small></div><div className="qr-code"><QRCodeSVG value={siteUrl} size={150} bgColor="#f6f0e7" fgColor="#191715" level="H"/><small>SCAN TO JOIN THE NIGHT</small></div></Reveal><Reveal className="last-cat"><Cat/><span>DON'T FORGET TO ROCK.</span></Reveal></section>
+    <section className="section qr-section"><Reveal className="qr-card"><div><p className="eyebrow orange">공연 페이지 공유</p><h2>대일밴드<br/><em>공연에서 만나요.</em></h2><p>친구에게 페이지를 공유하고<br/>공연 당일 QR로 바로 접속하세요.</p><small>{siteUrl}</small><button type="button" className="share-button" onClick={sharePage}><Share2 size={16}/> 공유하기</button>{shareMessage&&<p className="share-message" role="status">{shareMessage}</p>}</div><div className="qr-code"><QRCodeSVG value={siteUrl} size={150} bgColor="#f6f0e7" fgColor="#191715" level="H"/><small>QR 코드로 접속</small></div></Reveal><Reveal className="last-cat"><Cat/></Reveal></section>
 
-    <footer><div className="footer-top"><a className="logo" href="#top">B<span>/</span>N</a><p>MADE WITH MUSIC, FRIENDSHIP<br/>AND A LITTLE BIT OF NOISE.</p><a href="#top">BACK TO TOP ↑</a></div><div className="footer-bottom"><span>© 2026 BAND NIGHT</span><span>11.21 SAT / 18:00 — 21:00</span><a href="/host">HOST ACCESS ↗</a></div></footer>
+    <footer><div className="footer-top"><a className="logo cat-logo" href="#top"><img src="/images/cat-face-placeholder.svg" alt="대일밴드 고양이 로고"/></a><p>대일밴드와 함께해 주셔서 감사합니다.</p><a href="#top">맨 위로 ↑</a></div><div className="footer-bottom"><span>© 2026 DAEIL BAND · 배승호 Bae Seung Ho</span><span>2026.11.21 · 18:00 — 21:00</span></div></footer>
     <div className="sticky-rsvp"><a href="#rsvp">뒤풀이 참석 여부 보내기 ↗</a></div>
 
-    <AnimatePresence>{welcome&&<motion.div className="welcome-bg" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}><motion.div className="welcome" initial={{opacity:0,y:25,scale:.96}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:15}}><button className="close" onClick={()=>setWelcome(false)}><X/></button><div className="welcome-cat">🐈🎸</div><p className="eyebrow orange">WELCOME TO BAND NIGHT</p><h2>반가워요!<br/><em>어떻게 불러드릴까요?</em></h2><p>닉네임을 정해 주세요. 비워두면 랜덤 닉네임으로 입장해요.</p><form onSubmit={saveName}><input autoFocus maxLength={14} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="닉네임 (최대 14자)"/><button>입장하기 ↗</button></form><small>닉네임은 이 기기에 저장돼요.</small></motion.div></motion.div>}</AnimatePresence>
+    <AnimatePresence>{welcome&&<motion.div className="welcome-bg" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}><motion.div className="welcome" initial={{opacity:0,y:25,scale:.96}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:15}}><button className="close" onClick={()=>setWelcome(false)}><X/></button><div className="welcome-cat">🐈🎸</div><p className="eyebrow orange">DAEIL BAND</p><h2>반가워요!<br/><em>어떻게 불러드릴까요?</em></h2><p>닉네임을 정해 주세요. 비워두면 랜덤 닉네임으로 입장해요.</p><form onSubmit={saveName}><input autoFocus maxLength={14} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="닉네임 (최대 14자)"/><button>입장하기 ↗</button></form><small>닉네임은 이 기기에 저장돼요.</small></motion.div></motion.div>}</AnimatePresence>
     {nickname&&<button className="nickname" onClick={()=>{setDraft(nickname);setWelcome(true);}}>👋 {nickname}</button>}
-    {checked&&!ready&&<div className="preview"><i/> PREVIEW MODE <span>공유 기능은 Supabase 연결 후 활성화돼요.</span></div>}
+    {checked&&!ready&&<div className="preview"><i/> 서버 설정 확인 필요 <span>{setupMessage||"Supabase 연결과 테이블 설정을 확인해 주세요."}</span></div>}
   </main>;
 }
