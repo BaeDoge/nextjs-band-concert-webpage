@@ -132,4 +132,4 @@ Run `supabase/migrations/20261112_gallery_settings.sql` once in Supabase SQL Edi
 
 The six photos uploaded for the event are downscaled and embedded in `public/images/activity-gallery.svg.gz` as small JPEG thumbnails. They are rendered in a non-clickable, continuous marquee under the final invitation panel. Browser context-menu and drag interactions are suppressed to discourage casual saving; public images cannot be made technically impossible to download because a browser must receive the image bytes to display them.
 
-The gallery is a single compressed SVG strip (about 32 KB before transport) repeated twice for a seamless left-to-right marquee.
+The gallery is a single compressed SVG strip (about 14 KB compressed, about 23 KB uncompressed) repeated twice for a seamless left-to-right marquee.
