@@ -1,0 +1,12 @@
+"use client";
+import {useState} from "react";
+import Link from "next/link";
+import {ArrowLeft,LockKeyhole,Send,CheckCircle2} from "lucide-react";
+export default function HostPage(){
+ const[key,setKey]=useState("");const[ok,setOk]=useState(false);const[items,setItems]=useState([]);const[answers,setAnswers]=useState({});const[error,setError]=useState("");const[busy,setBusy]=useState(false);
+ async function load(){setBusy(true);setError("");try{const r=await fetch("/api/questions",{headers:{"x-admin-key":key},cache:"no-store"});const d=await r.json();if(!r.ok)throw Error(d.error);setItems(d.items||[]);setOk(true);}catch(e){setOk(false);setError(e.message);}finally{setBusy(false);}}
+ async function answer(id){const answer=(answers[id]||"").trim();if(!answer)return;setBusy(true);try{const r=await fetch("/api/questions",{method:"PATCH",headers:{"Content-Type":"application/json","x-admin-key":key},body:JSON.stringify({id,answer})});const d=await r.json();if(!r.ok)throw Error(d.error);setAnswers(a=>({...a,[id]:""}));await load();}catch(e){setError(e.message);}finally{setBusy(false);}}
+ return <main className="host"><Link href="/" className="host-back"><ArrowLeft size={16}/> 공연 페이지로</Link><header><small>PRIVATE HOST DASHBOARD</small><h1>질문함 <em>관리</em></h1><p>운영자만 질문을 확인하고 답변할 수 있어요.</p></header>
+ {!ok?<form className="host-login" onSubmit={e=>{e.preventDefault();load();}}><LockKeyhole size={28}/><label htmlFor="secret">운영자 접근 키</label><input id="secret" type="password" value={key} onChange={e=>setKey(e.target.value)} placeholder="ADMIN_ACCESS_KEY" required/><button disabled={busy}>{busy?"확인 중...":"질문함 열기"}</button></form>:<section className="host-list"><div className="host-list-head"><b>받은 질문 ({items.length})</b><button onClick={load}>새로고침 ↻</button></div>{items.length===0?<p>아직 도착한 질문이 없어요.</p>:items.map(q=><article key={q.id}><div><span>{q.nickname||"익명의 관객"}</span><time>{new Date(q.created_at).toLocaleString("ko-KR")}</time><b>{q.answer?"답변 완료":"미답변"}</b></div><p>{q.body}</p>{q.answer?<aside><CheckCircle2 size={15}/>{q.answer}</aside>:<section><input value={answers[q.id]||""} onChange={e=>setAnswers(a=>({...a,[q.id]:e.target.value}))} placeholder="답변 입력"/><button disabled={busy||!(answers[q.id]||"").trim()} onClick={()=>answer(q.id)}><Send size={14}/> 답변</button></section>}</article>)}</section>}
+ {error&&<p className="host-error">{error}</p>}<p className="host-note">접근 키는 브라우저에 저장하지 않으며 서버 환경변수와 대조합니다.</p></main>;
+}
