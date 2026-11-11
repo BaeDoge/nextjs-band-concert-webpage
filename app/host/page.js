@@ -52,7 +52,7 @@ export default function HostPage(){
 
  return <main className="host">
   <Link href="/" className="host-back"><ArrowLeft size={16}/> 공연 페이지로</Link>
-  <header><small>대일밴드 운영자</small><h1>관리자 <em>페이지</em></h1><p>익명 메시지를 확인하고 관객 응원 기록을 관리합니다.</p></header>
+  <header><small>대일밴드 운영자</small><h1>관리자 <em>페이지</em></h1><p>메시지를 확인하고 관객 응원 기록을 관리합니다.</p></header>
   {!ok?
    <form className="host-login" onSubmit={event=>{event.preventDefault();load();}}>
     <LockKeyhole size={28}/><label htmlFor="secret">관리자 접근 키</label>
@@ -67,10 +67,10 @@ export default function HostPage(){
      <p>초기화하면 관객 화면의 누적 숫자도 0으로 반영됩니다. 이미 화면에 떠 있는 응원 애니메이션은 잠시 후 사라집니다.</p>
     </section>
     <section className="host-list">
-     <div className="host-list-head"><b>익명 메시지 ({items.length})</b><button onClick={load} disabled={busy}><RefreshCw size={13}/> 새로고침</button></div>
+     <div className="host-list-head"><b>받은 메시지 ({items.length})</b><button onClick={load} disabled={busy}><RefreshCw size={13}/> 새로고침</button></div>
      {items.length===0?<p className="host-empty">아직 도착한 메시지가 없어요.</p>:items.map(item=>
       <article key={item.id}>
-       <div><span>익명 관객</span><time>{new Date(item.created_at).toLocaleString("ko-KR")}</time><b>{item.answer?"답변 완료":"미답변"}</b></div>
+       <div><span>{item.nickname||"관객"}</span><time>{new Date(item.created_at).toLocaleString("ko-KR")}</time><b>{item.answer?"답변 완료":"미답변"}</b></div>
        <p>{item.body}</p>
        {item.answer?<aside><CheckCircle2 size={15}/>{item.answer}</aside>:
         <section><input value={answers[item.id]||""} onChange={event=>setAnswers(current=>({...current,[item.id]:event.target.value}))} placeholder="답변 입력"/><button disabled={busy||!(answers[item.id]||"").trim()} onClick={()=>answer(item.id)}><Send size={14}/> 답변</button></section>}
