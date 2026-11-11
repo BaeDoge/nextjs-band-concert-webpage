@@ -385,3 +385,15 @@ button,input,textarea,select{font-family:inherit}
  .host-stat-grid span{font-size:9px}
  .host-reaction-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+.hero h1{letter-spacing:-.015em;word-spacing:.015em}
+.hero h1 em{letter-spacing:-.005em}
+.hero-brand-sub{margin:18px 0 0;font-size:15px;font-weight:600;letter-spacing:.09em;color:rgba(255,255,255,.76);text-align:center}
+.hero-brand-sub span{color:var(--orange);padding:0 7px}
+.question-card textarea,.question-card textarea::placeholder{font-family:inherit;font-size:14px;line-height:1.7}
+.question-card textarea::placeholder{color:#a1968a;opacity:1}
+@media(max-width:800px){
+ .hero h1{letter-spacing:-.015em;word-spacing:.015em}
+ .hero-brand-sub{font-size:13px;margin-top:14px}
+ .question-card textarea,.question-card textarea::placeholder{font-size:13px}
+}
