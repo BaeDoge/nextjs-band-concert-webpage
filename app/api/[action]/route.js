@@ -28,7 +28,7 @@ export async function GET(req,ctx){
  if(action==="cheers"){
   const{data,error}=await client.from("cheers").select("id,nickname,emoji,created_at").order("created_at",{ascending:false}).limit(30);
   if(error)return NextResponse.json({error:"응원 목록을 불러오지 못했어요.",code:error.code||"DB_ERROR"},{status:500});
-  const{count,countError}=await client.from("cheers").select("id",{count:"exact",head:true});
+  const{count,error:countError}=await client.from("cheers").select("id",{count:"exact",head:true});
   if(countError)return NextResponse.json({error:"응원 누적 수를 불러오지 못했어요.",code:countError.code||"DB_ERROR"},{status:500});
   return NextResponse.json({items:data||[],total:count||0});
  }
