@@ -46,49 +46,17 @@ function Reveal({children,className="",delay=0}) {
 function Countdown() {
   const [time,setTime]=useState(null);
   useEffect(()=>{
-    const target=new Date("2026-11-21T18:00:00+09:00").getTime();
-    const tick=()=>{const d=Math.max(0,target-Date.now());setTime([Math.floor(d/86400000),Math.floor(d%86400000/3600000),Math.floor(d%3600000/60000),Math.floor(d%60000/1000)]);};
-    tick();const id=setInterval(tick,1000);return()=>clearInterval(id);
-  },[]);
-  return <div className="countdown">{(time||[0,0,0,0]).map((v,i)=><div key={i}><b>{String(v).padStart(2,"0")}</b><small>{["일","시간","분","초"][i]}</small></div>)}</div>;
-}
-function Cat({className=""}) {
-  return <div className={"cat-wrap "+className}><img src="/images/guitar-cat.webp" alt="헤드폰을 쓰고 기타를 연주하는 오렌지색 고양이" onError={e=>{e.currentTarget.style.display="none";if(e.currentTarget.nextElementSibling)e.currentTarget.nextElementSibling.style.display="block";}}/><span className="cat-fallback">🐈🎸</span><i>✳</i><b>✦</b></div>;
-}
-
-export default function Home() {
-  const [nickname,setNickname]=useState("");
-  const [draft,setDraft]=useState("");
-  const [welcome,setWelcome]=useState(false);
-  const [ready,setReady]=useState(false);
-  const [checked,setChecked]=useState(false);
-  const [setupMessage,setSetupMessage]=useState("");
-  const [cheerMessage,setCheerMessage]=useState("");
-  const [shareMessage,setShareMessage]=useState("");
-  const seenCheerIds=useRef(new Set());
-  const [cheers,setCheers]=useState([]);
-  const [cheerCount,setCheerCount]=useState(0);
-  const [floating,setFloating]=useState([]);
-  const [question,setQuestion]=useState("");
-  const [questionInfo,setQuestionInfo]=useState("");
-  const [attendance,setAttendance]=useState("yes");
-  const [people,setPeople]=useState("1");
-  const [afterMessage,setAfterMessage]=useState("");
-  const [rsvpInfo,setRsvpInfo]=useState("");
-  const [summary,setSummary]=useState({yes:0,maybe:0,no:0});
-  const [videoError,setVideoError]=useState(false);
-  const [overlayMounted,setOverlayMounted]=useState(false);
-  const siteUrl="https://daeil-band.vercel.app";
-  const {scrollYProgress}=useScroll();
-  const progress=useSpring(scrollYProgress,{stiffness:100,damping:30,restDelta:.001});
-
-  useEffect(()=>{
     setOverlayMounted(true);
-    const saved=localStorage.getItem("band-night-name");
-    if(saved)setNickname(saved);
-    else{const n=randomName();setNickname(n);setDraft(n);setWelcome(true);}
-
     let active=true;
+    const saved=localStorage.getItem("band-night-name");
+    const initialName=saved||randomName();
+    if(saved)setNickname(saved);
+    else{setNickname(initialName);setDraft(initialName);setWelcome(true);}
+    let id=localStorage.getItem("band-night-visitor");
+    if(!id){id=crypto.randomUUID();localStorage.setItem("band-night-visitor",id);}
+    setVisitorId(id);
+    registerVisitor(id,initialName);
+
     let initialSnapshotLoaded=false;
     const loadStatus=async()=>{
       try{
@@ -96,15 +64,16 @@ export default function Home() {
         const data=await response.json();
         if(!active)return;
         setReady(Boolean(data.configured));
-        setSetupMessage(data.message||"");
+        if(data.message)setSetupMessage(data.message);
         setChecked(true);
       }catch{
-        if(active){setReady(false);setSetupMessage("서버 상태를 확인하지 못했어요. 잠시 후 다시 접속해 주세요.");setChecked(true);}
+        if(active){setReady(false);setSetupMessage("서버 상태를 확인하지 못했어요.");setChecked(true);}
       }
     };
-    const refreshCheers=async()=>{
+    const refreshLive=async()=>{
+      if(document.visibilityState!=="visible")return;
       try{
-        const response=await fetch("/api/cheers",{cache:"no-store"});
+        const response=await fetch("/api/live",{cache:"no-store"});
         if(!response.ok)throw new Error("응원 기록을 불러오지 못했어요.");
         const data=await response.json();
         if(!active)return;
@@ -114,31 +83,31 @@ export default function Home() {
         setCheers(items);
         setCheerCount(Number(data.total||0));
         if(fresh.length){
-          const effects=fresh.map((item,index)=>({id:item.id,emoji:item.emoji,nickname:item.nickname||"익명의 관객",x:12+((index*19+Math.random()*16)%76)}));
-          setFloating(current=>[...effects,...current].slice(0,24));
-          effects.forEach(item=>window.setTimeout(()=>setFloating(current=>current.filter(value=>value.id!==item.id)),2400));
+          const effects=fresh.map((item,index)=>({id:item.id,emoji:item.emoji,nickname:item.nickname||"관객",x:8+((index*17+Math.random()*20)%84)}));
+          setFloating(current=>[...effects,...current].slice(0,30));
+          effects.forEach(item=>window.setTimeout(()=>setFloating(current=>current.filter(value=>value.id!==item.id),4400));
         }
       }catch{
         if(active&&initialSnapshotLoaded)setCheerMessage("응원 기록을 서버에서 불러오지 못했어요.");
       }
     };
-    const refreshRsvp=async()=>{
+    const loadRsvp=async()=>{
       try{const response=await fetch("/api/rsvp",{cache:"no-store"});if(!response.ok)return;const data=await response.json();if(active&&data.summary)setSummary(data.summary);}catch{}
     };
     loadStatus();
-    refreshCheers().then(()=>{initialSnapshotLoaded=true;});
-    refreshRsvp();
-    const poll=window.setInterval(()=>{refreshCheers();refreshRsvp();},3000);
+    refreshLive().then(()=>{initialSnapshotLoaded=true;});
+    loadRsvp();
+    const poll=window.setInterval(refreshLive,10000);
     return()=>{active=false;window.clearInterval(poll);};
   },[]);
 
-  const saveName=e=>{e.preventDefault();const n=draft.trim().slice(0,14)||randomName();localStorage.setItem("band-night-name",n);setNickname(n);setWelcome(false);};
+  const saveName=async e=>{e.preventDefault();const n=draft.trim().slice(0,14)||randomName();localStorage.setItem("band-night-name",n);setNickname(n);setWelcome(false);if(visitorId)await registerVisitor(visitorId,n);};
   const cheer=async emoji=>{
     playCheerSound();
     if(!ready){setCheerMessage(setupMessage||"응원 저장 서버가 연결되지 않았어요.");return;}
     setCheerMessage("");
     try{
-      const response=await fetch("/api/cheers",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nickname:nickname||"익명의 관객",emoji})});
+      const response=await fetch("/api/cheers",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({visitorId,emoji})});
       const data=await response.json();
       if(!response.ok)throw new Error(data.error||"응원을 저장하지 못했어요.");
       const item=data.item;
@@ -163,19 +132,19 @@ export default function Home() {
     e.preventDefault();if(!question.trim())return;
     if(!ready){setQuestionInfo(setupMessage||"메시지 전송 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.");return;}
     setQuestionInfo("전송 중...");
-    try{const r=await fetch("/api/questions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body:question.trim(),nickname:nickname||"관객"})});const d=await r.json();if(!r.ok)throw Error(d.error);setQuestion("");setQuestionInfo("메시지를 전달했어요. 고마워요!");}
+    try{const r=await fetch("/api/questions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body:question.trim(),visitorId})});const d=await r.json();if(!r.ok)throw Error(d.error);setQuestion("");setQuestionInfo("메시지를 전달했어요. 고마워요!");}
     catch(e){setQuestionInfo(e.message||"전송에 실패했어요.");}
   };
   const rsvp=async e=>{
     e.preventDefault();if(!ready){setRsvpInfo(setupMessage||"응답 서버가 아직 연결되지 않았어요.");return;}
-    const visitorId=localStorage.getItem("band-night-visitor")||crypto.randomUUID();localStorage.setItem("band-night-visitor",visitorId);setRsvpInfo("저장 중...");
+    setRsvpInfo("저장 중...");
     try{const r=await fetch("/api/rsvp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({visitorId,nickname,attendance,headcount:attendance==="yes"?Number(people):0,message:afterMessage.trim()})});const d=await r.json();if(!r.ok)throw Error(d.error);setRsvpInfo("참석 응답을 저장했어요. 고마워요!");if(d.summary)setSummary(d.summary);}
     catch(e){setRsvpInfo(e.message||"저장에 실패했어요.");}
   };
 
   return <><main className="shell">
     <motion.div className="progress" style={{scaleX:progress}}/>
-    <nav className="nav"><a className="logo cat-logo" href="#top" aria-label="대일밴드 처음으로"><img src="/images/cat-face-placeholder.svg" alt="대일밴드 고양이 로고"/></a><div><a href="#about">소개</a><a href="#setlist">셋리스트</a><a href="#members">멤버</a><a href="#cheer">응원</a></div><a className="nav-cta" href="#questions">메시지 보내기 ↗</a></nav>
+    <nav className="nav"><a className="logo cat-logo" href="#top" aria-label="대일밴드 처음으로"><img src="/images/cat-headphones.svg" alt="대일밴드 고양이 로고"/></a><div><a href="#about">소개</a><a href="#setlist">셋리스트</a><a href="#members">멤버</a><a href="#cheer">응원</a></div><a className="nav-cta" href="#questions">메시지 보내기 ↗</a></nav>
 
     <section className="hero" id="top">
       <div className="hero-grain"/>
@@ -185,7 +154,7 @@ export default function Home() {
       </div>
       <motion.div className="stage" initial={{opacity:0,scale:.92,y:20}} animate={{opacity:1,scale:1,y:0}} transition={{delay:.2,duration:.9}}>
         <div className="stage-halo"/>
-        <div className="video-window">{!videoError?<video src="/media/concert-cat.mp4" autoPlay muted loop playsInline preload="metadata" onError={()=>setVideoError(true)} aria-label="기타를 연주하는 고양이 영상"/>:<Cat/>}<div className="video-copy"><span>대일밴드</span></div></div>
+        <div className="video-window">{!videoError?<video src="/media/concert-cat.mp4" autoPlay muted loop playsInline preload="metadata" onError={()=>setVideoError(true)} aria-label="기타를 연주하는 고양이 영상"/>:<Cat/>}</div>
       </motion.div>
       <div className="hero-countdown">
         <span>COUNTDOWN TO SHOWTIME</span>
@@ -256,6 +225,6 @@ export default function Home() {
     {nickname&&<button className="nickname" onClick={()=>{setDraft(nickname);setWelcome(true);}}>👋 {nickname}</button>}
     {checked&&!ready&&<div className="preview"><i/> 연결 확인 필요 <span>{setupMessage||"Supabase 연결과 테이블 설정을 확인해 주세요."}</span></div>}
   </main>
-  {overlayMounted&&createPortal(<div className="global-cheer-overlay" aria-live="polite"><AnimatePresence>{floating.map(f=><motion.div className="float-cheer" key={f.id} style={{left:f.x+"%"}} initial={{opacity:0,y:25,scale:.55}} animate={{opacity:[0,1,1,0],y:-260,scale:[.6,1.15,1],rotate:8}} exit={{opacity:0}} transition={{duration:2.35}}><b>{f.emoji}</b><small>{f.nickname}</small></motion.div>)}</AnimatePresence></div>,document.body)}
+  {overlayMounted&&createPortal(<div className="global-cheer-overlay" aria-live="polite"><AnimatePresence>{floating.map(f=><motion.div className="float-cheer" key={f.id} style={{left:f.x+"%"}} initial={{opacity:0,y:25,scale:.55}} animate={{opacity:[0,1,1,1,0],y:[30,-180,-420,-650],scale:[.55,1.12,1.06,1],rotate:8}} exit={{opacity:0}} transition={{duration:4.4,ease:"easeOut"}}><b>{f.emoji}</b><small>{f.nickname}</small></motion.div>)}</AnimatePresence></div>,document.body)}
   </>;
 }
