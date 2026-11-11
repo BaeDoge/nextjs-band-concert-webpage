@@ -124,3 +124,12 @@ Vercel Project Settings → Environment Variables에서 `SUPABASE_URL`, `SUPABAS
 ### 응원 API 부하 개선
 
 공개 페이지는 응원 현황을 10초마다 단일 `/api/live` 요청으로 조회하고, 브라우저 탭이 보이지 않을 때는 조회를 건너뜁니다. 관리자별 이모티콘 집계는 DB 함수에서 계산해 API가 대량의 cheers 행을 내려받지 않습니다.
+
+
+## Activity photo carousel
+
+Run `supabase/migrations/20261112_gallery_settings.sql` once in Supabase SQL Editor. This creates the persistent `site_settings.gallery_enabled` option (default ON). The administrator can toggle it in `/host`.
+
+The six photos uploaded for the event are downscaled and embedded in `public/images/activity-gallery.svg.gz` as small JPEG thumbnails. They are rendered in a non-clickable, continuous marquee under the final invitation panel. Browser context-menu and drag interactions are suppressed to discourage casual saving; public images cannot be made technically impossible to download because a browser must receive the image bytes to display them.
+
+The gallery is a single compressed SVG strip (about 32 KB before transport) repeated twice for a seamless left-to-right marquee.
