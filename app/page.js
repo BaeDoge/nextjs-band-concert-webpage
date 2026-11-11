@@ -159,9 +159,9 @@ export default function Home() {
       <div className="hero-grain"/>
       <div className="hero-overline"><span>DAEIL BAND</span><span>목동 제이에스아트홀</span></div>
       <div className="hero-title">
-        <p className="eyebrow"><i/> LIVE PERFORMANCE INVITATION</p>
-        <motion.h1 initial={{opacity:0,y:35}} animate={{opacity:1,y:0}} transition={{duration:1,ease:[.22,1,.36,1]}}>BAND<br/><em>NIGHT</em><sup>26</sup></motion.h1>
-        <motion.p className="hero-sub" initial={{opacity:0,y:15}} animate={{opacity:1,y:0}} transition={{delay:.35}}>우리들의 무대, 우리의 플레이리스트. <span>{dayLabel}</span></motion.p>
+        <p className="eyebrow"><i/> 2026 대일밴드 공연</p>
+        <motion.h1 initial={{opacity:0,y:35}} animate={{opacity:1,y:0}} transition={{duration:1,ease:[.22,1,.36,1]}}>DAEIL<br/><em>BAND</em><sup>26</sup></motion.h1>
+        <motion.p className="hero-sub" initial={{opacity:0,y:15}} animate={{opacity:1,y:0}} transition={{delay:.35}}>2026. 11. 21 (토) 오후 6시</motion.p>
       </div>
       <motion.div className="stage" initial={{opacity:0,scale:.92,y:20}} animate={{opacity:1,scale:1,y:0}} transition={{delay:.2,duration:.9}}>
         <div className="stage-halo"/>
@@ -172,49 +172,48 @@ export default function Home() {
     </section>
 
     <section className="section intro" id="about">
-      <div className="kicker"><span>01 / THE INVITATION</span><span>COME AS YOU ARE</span></div>
+      <div className="kicker"><span>01 / 대일밴드 소개</span><span>2024 — 2026</span></div>
       <div className="intro-grid">
-        <Reveal><p className="eyebrow orange">DEAR MUSIC LOVERS,</p><h2>좋아하는 음악으로<br/><em>한 장면</em>을 만들어요.</h2><p className="body-copy">익숙한 멜로디부터 마음을 흔드는 한 곡까지.<br/>각자의 악기와 목소리로 준비한 90분을 함께 나눠요.<br/>우리가 무대 위에서 신나게 놀 수 있도록<br/>여러분은 가장 큰 목소리로 함께해 주세요.</p><p className="signature">SEE YOU IN THE CROWD <b>✳</b></p></Reveal>
+        <Reveal><p className="eyebrow orange">DAEIL BAND</p><h2>안녕하세요<br/><em>대일밴드입니다.</em></h2><p className="body-copy">2024년 5명으로 시작해 현재 31명이 함께 활동하고 있는 초보 밴드입니다.<br/>저희가 준비한 노래를 재미있게 즐겨 주셨으면 좋겠습니다.<br/>아낌없는 박수와 호응 부탁드립니다!</p><p className="signature">대일밴드 승호 드림</p></Reveal>
         <Reveal className="cat-stage" delay={.12}><div className="orbit one"/><div className="orbit two"/><Cat className="intro-cat"/><span className="cat-label">OUR LITTLE<br/>ROCK STAR</span></Reveal>
       </div>
       <div className="count-panel"><div><small>공연 시작까지</small><b>11월 21일 토요일 오후 6시</b></div><Countdown/></div>
     </section>
 
     <section className="section setlist" id="setlist">
-      <div className="kicker inverse"><span>02 / THE PLAYLIST</span><span>11 TRACKS, 90 MINUTES</span></div>
-      <div className="set-head"><Reveal><p className="eyebrow">♫ THE SETLIST</p><h2>PRESS<br/><em>PLAY.</em></h2></Reveal><Reveal className="set-aside" delay={.1}><b>01 — 11</b><p>함께 따라 부를 준비됐나요?<br/>우리의 플레이리스트를 공개합니다.</p><div className="eq"><i/><i/><i/><i/><i/><i/><i/></div></Reveal></div>
+      <div className="kicker inverse"><span>02 / 셋리스트</span><span>총 11곡</span></div>
+      <div className="set-head"><Reveal><p className="eyebrow">공연 순서</p><h2>함께 즐길<br/><em>노래들.</em></h2></Reveal><Reveal className="set-aside" delay={.1}><b>01 — 11</b><p>대일밴드가 준비한<br/>열한 곡을 들려드립니다.</p><div className="eq"><i/><i/><i/><i/><i/><i/><i/></div></Reveal></div>
       <div className="songs">{songs.map(([song,artist],i)=><motion.div className="song" key={song} initial={{opacity:0,x:-20}} whileInView={{opacity:1,x:0}} viewport={{once:true,amount:.4}} transition={{delay:Math.min(i*.035,.28),duration:.5}}><span>{String(i+1).padStart(2,"0")}</span><b>{song}</b><small>{artist}</small><i>↗</i></motion.div>)}</div>
       <p className="song-note">* 공연 순서는 현장 상황에 따라 조금 달라질 수 있어요.</p>
     </section>
 
     <section className="section schedule">
-      <div className="kicker"><span>03 / THE SCHEDULE</span><span>MARK YOUR CALENDAR</span></div>
-      <div className="schedule-head"><h2>THE NIGHT<br/><em>IN A NUTSHELL.</em></h2><div className="calendar"><CalendarDays/><b>21</b><span>NOV / SAT</span><small>2026</small></div></div>
+      <div className="kicker"><span>03 / 공연 일정</span><span>2026년 11월 21일 토요일</span></div>
+      <div className="schedule-head"><h2>공연<br/><em>일정 안내.</em></h2><div className="calendar"><CalendarDays/><b>21</b><span>NOV / SAT</span><small>2026</small></div></div>
       <div className="timeline">
-        <div className="time-row active"><b>18:00</b><i/><div><small>THE MAIN SHOW</small><h3>우리 밴드 공연 시작!</h3><p>오늘의 주인공, 우리들의 90분.</p></div><span>90 MIN</span></div>
-        <div className="time-row"><b>19:30</b><i/><div><small>NEXT CHAPTER</small><h3>밴드 공연 종료</h3><p>이후 프로그램은 추후 안내할게요.</p></div><span>—</span></div>
+        <div className="time-row active"><b>18:00</b><i/><div><small>1부</small><h3>대일밴드 공연 시작</h3><p>대일밴드의 첫 번째 무대입니다.</p></div><span>90분</span></div>
+        <div className="time-row"><b>19:30</b><i/><div><small>2부</small><h3>2부 공연 시작</h3><p>이어지는 무대도 함께 즐겨주세요.</p></div><span>—</span></div>
         <div className="time-row"><b>21:00</b><i/><div><small>THAT'S A WRAP</small><h3>전체 행사 마무리</h3><p>아쉬움은 뒤풀이에서 이어가요.</p></div><span>END</span></div>
       </div>
       <div className="venue"><div><MapPin/></div><section><small>VENUE / LOCATION</small><b>목동 제이에스아트홀</b><p>서울 양천구 등촌로 36 지하 1층 (목동)</p><a href="https://map.naver.com/p/search/목동%20제이에스아트홀" target="_blank" rel="noreferrer">네이버 지도에서 위치 확인 ↗</a></section><span>SEE YOU THERE</span></div>
     </section>
 
     <section className="section members" id="members">
-      <div className="kicker"><span>04 / THE PEOPLE</span><span>THE SOUND OF US</span></div>
-      <div className="members-head"><h2>MEET THE<br/><em>NOISE MAKERS.</em></h2><p>각자의 자리에서 같은 방향을 바라보는<br/>우리 밴드의 멤버들을 소개합니다.</p></div>
-      <div className="member-grid">{groups.map(([role,label,emoji,names],i)=><Reveal className={"member-card member-"+i} key={role} delay={i*.06}><div className="member-top"><span>{role}</span><span>{String(names.length).padStart(2,"0")}</span></div><strong>{emoji}</strong><h3>{label}</h3><div>{names.map(n=><span key={n}>{n}</span>)}</div><i/></Reveal>)}</div>
-      <div className="miss"><span>✈️</span><div><small>WE MISS YOU</small><b>다은</b><p>미국 출장으로 함께하지 못해요. 마음만은 무대 앞 1열!</p></div><strong>NEXT<br/>TIME ♡</strong></div>
+      <div className="kicker"><span>04 / 함께하는 멤버</span><span>대일밴드 공연 멤버</span></div>
+      <div className="members-head"><h2>우리와 함께할<br/><em>멤버들.</em></h2><p>31명의 대일밴드 중<br/>이번 무대를 함께 만드는 멤버들입니다.</p></div>
+      <div className="member-grid">{groups.map(([role,label,emoji,names],i)=><Reveal className={"member-card member-"+i} key={role} delay={i*.06}><div className="member-top"><span>{role}</span><span>{String(names.length).padStart(2,"0")}</span></div><strong>{emoji}</strong><h3>{label}</h3><div>{names.map(n=><span key={n}>{n}</span>)}</div>{role==="OVERSEAS SALES"&&<p className="member-note">미국 출장으로 못 오게 되었지만 마음만은 함께!</p>}<i/></Reveal>)}</div>
     </section>
 
     <section className="section cheers" id="cheer">
-      <div className="kicker inverse"><span>05 / SEND SOME LOVE</span><span>MAKE SOME NOISE</span></div>
-      <div className="cheer-grid"><Reveal><p className="eyebrow">✦ CROWD PARTICIPATION</p><h2>YOUR ENERGY<br/>IS OUR <em>AMPLIFIER.</em></h2><p className="body-copy">버튼을 누르고 응원을 보내주세요.<br/>여러분의 리액션이 무대를 더 뜨겁게 만들어요!</p></Reveal>
-      <Reveal className="cheer-box" delay={.12}><div className="cheer-count"><b>{cheerCount.toLocaleString("ko-KR")}</b><small>CHEERS & COUNTING</small></div><div className="reaction-grid">{reactions.map(([emoji,label])=><button key={emoji} onClick={()=>cheer(emoji)}><b>{emoji}</b><small>{label}</small></button>)}</div><div className="cheer-wall"><div><span>LIVE CHEER WALL</span><b><i/> LIVE</b></div><section>{cheers.slice(0,6).map((c,i)=><span key={c.id||i}>{c.emoji} <small>{c.nickname}</small></span>)}{!cheers.length&&<small>첫 번째 응원을 남겨주세요!</small>}</section></div></Reveal></div>
-      <AnimatePresence>{floating.map(f=><motion.span className="float-emoji" key={f.id} style={{left:f.x+"%"}} initial={{opacity:0,y:25,scale:.4}} animate={{opacity:[0,1,1,0],y:-260,scale:[.5,1.4,1],rotate:18}} exit={{opacity:0}} transition={{duration:1.8}}>{f.emoji}</motion.span>)}</AnimatePresence>
+      <div className="kicker inverse"><span>05 / 응원 보내기</span><span>버튼을 눌러 응원하기</span></div>
+      <div className="cheer-grid"><Reveal><p className="eyebrow">대일밴드에게 보내는 응원</p><h2>응원으로<br/><em>함께해요.</em></h2><p className="body-copy">응원 버튼을 누르면 다른 관객에게도<br/>닉네임과 함께 응원 애니메이션이 보여요.</p></Reveal>
+      <Reveal className="cheer-box" delay={.12}><div className="cheer-count"><b>{cheerCount.toLocaleString("ko-KR")}</b><small>누적 응원</small></div><div className="reaction-grid">{reactions.map(([emoji,label])=><button type="button" aria-label={label} key={emoji} onClick={()=>cheer(emoji)}><b>{emoji}</b></button>)}</div><p className="cheer-message" role="status">{cheerMessage}</p><div className="cheer-wall"><div><span>최근 도착한 응원</span><b><i/> 실시간</b></div><section>{cheers.slice(0,6).map((item,i)=><span key={item.id||i}>{item.emoji} <small>{item.nickname||"익명의 관객"}</small></span>)}{!cheers.length&&<small>첫 응원을 남겨주세요.</small>}</section></div></Reveal></div>
+      <AnimatePresence>{floating.map(f=><motion.div className="float-cheer" key={f.id} style={{left:f.x+"%"}} initial={{opacity:0,y:25,scale:.55}} animate={{opacity:[0,1,1,0],y:-250,scale:[.6,1.15,1],rotate:8}} exit={{opacity:0}} transition={{duration:2.35}}><b>{f.emoji}</b><small>{f.nickname}</small></motion.div>)}</AnimatePresence>
     </section>
 
-    <section className="section questions">
-      <div className="kicker"><span>06 / ASK THE GUITAR GUY</span><span>ANONYMOUS Q&A</span></div>
-      <div className="question-grid"><div><p className="eyebrow orange">◉ SECRET MESSAGE</p><h2>궁금한 건<br/><em>승호에게.</em></h2><p className="body-copy">공연 중간중간 확인할게요.<br/>하고 싶은 말이나 질문을 익명으로 보내주세요.<br/>닉네임은 표시하지 않아도 되고,<br/>질문은 운영자 승호만 확인할 수 있어요.</p><div className="lock-note">🔒 질문은 승호만 확인할 수 있어요.</div></div>
+    <section className="section questions" id="questions">
+      <div className="kicker"><span>06 / 익명 메시지 보내기</span><span>대일밴드에게 하고 싶은 말</span></div>
+      <div className="question-grid"><div><p className="eyebrow orange">익명으로 전달됩니다</p><h2>익명 메시지<br/><em>보내기.</em></h2><p className="body-copy">하고 싶은 말이나 궁금한 점을 편하게 남겨주세요.<br/>메시지는 익명으로 전달되며 운영자만 확인할 수 있습니다.</p><div className="lock-note">🔒 메시지는 운영자만 확인할 수 있어요.</div></div>
       <Reveal className="question-card" delay={.1}><div className="form-top"><span>익명 메시지</span><span>이름 없이 전달</span></div><div className="anon">✉ <span>익명 메시지</span></div><form onSubmit={ask}><label htmlFor="question">보내고 싶은 메시지</label><textarea id="question" value={question} onChange={e=>setQuestion(e.target.value)} maxLength={500} placeholder="예: 다음 곡은 어떤 곡인가요? 기타 솔로 기대할게요!" required/><div className="form-actions"><small>{question.length} / 500</small><button disabled={!question.trim()}> <Send size={14}/> 메시지 보내기</button></div></form>{questionInfo&&<p className="feedback">{questionInfo}</p>}</Reveal></div>
     </section>
 
