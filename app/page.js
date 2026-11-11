@@ -163,7 +163,8 @@ export default function Home() {
     loadRsvp();
     loadGallerySetting();
     const poll=window.setInterval(refreshLive,10000);
-    return()=>{active=false;window.clearInterval(poll);};
+    const galleryPoll=window.setInterval(loadGallerySetting,30000);
+    return()=>{active=false;window.clearInterval(poll);window.clearInterval(galleryPoll);};
   },[]);
 
   const saveName=async e=>{
