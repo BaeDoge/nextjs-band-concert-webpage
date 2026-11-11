@@ -89,3 +89,12 @@ git push origin main
 - 장소: 목동 제이에스아트홀 (서울 양천구 등촌로 36 지하 1층, 목동)
 - 셋리스트 11곡 및 멤버 정보: 전달받은 내용 반영
 - 밴드 공식 명칭 및 뒤풀이 장소/시간: 추후 확정 시 업데이트
+
+
+## PREVIEW / 연결 오류 확인
+
+메인 화면 하단의 연결 안내는 `/api/status`가 Supabase URL, 서버용 키, 세 테이블 조회를 확인한 결과입니다. 안내 메시지에 누락된 환경변수나 테이블명이 표시됩니다.
+
+Vercel Project Settings → Environment Variables에서 `SUPABASE_URL`, `SUPABASE_SECRET_KEY`(또는 `SUPABASE_SERVICE_ROLE_KEY`)를 **Production** 환경에 등록했는지 확인하세요. 운영자 질문함을 사용하려면 `ADMIN_ACCESS_KEY`도 Production에 필요합니다. 값을 추가하거나 수정했다면 반드시 새 Production Deployment를 실행해야 합니다.
+
+응원 수는 DB에 저장된 전체 행 개수를 기준으로 표시합니다. 관리자 페이지에서 초기화하면 `cheers` 테이블의 기록이 삭제되고 관객 화면도 다음 동기화 때 0으로 바뀝니다.
