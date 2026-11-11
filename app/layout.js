@@ -3,7 +3,7 @@ import "./globals.css";
 export const metadata = {
   metadataBase: new URL("https://daeil-band.vercel.app"),
   title: "대일밴드 공연 | 2026.11.21",
-  description: "2026년 11월 21일 목동 제이에스아트홀에서 만나요. 대일밴드 공연 안내, 셋리스트, 멤버, 응원과 익명 메시지.",
+  description: "2026년 11월 21일 목동 제이에스아트홀에서 만나요. 대일밴드 공연 안내, 셋리스트, 멤버, 응원과 메시지.",
   alternates: { canonical: "/" },
   icons: { icon: "/images/cat-face-placeholder.svg", shortcut: "/images/cat-face-placeholder.svg" },
   openGraph: {
