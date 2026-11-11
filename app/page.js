@@ -46,6 +46,56 @@ function Reveal({children,className="",delay=0}) {
 function Countdown() {
   const [time,setTime]=useState(null);
   useEffect(()=>{
+    const target=new Date("2026-11-21T18:00:00+09:00").getTime();
+    const tick=()=>{const d=Math.max(0,target-Date.now());setTime([Math.floor(d/86400000),Math.floor(d%86400000/3600000),Math.floor(d%3600000/60000),Math.floor(d%60000/1000)]);};
+    tick();const id=setInterval(tick,1000);return()=>clearInterval(id);
+  },[]);
+  return <div className="countdown">{(time||[0,0,0,0]).map((v,i)=><div key={i}><b>{String(v).padStart(2,"0")}</b><small>{["일","시간","분","초"][i]}</small></div>)}</div>;
+}
+function Cat({className=""}) {
+  return <div className={"cat-wrap "+className}><img src="/images/guitar-cat.webp" alt="헤드폰을 쓰고 기타를 연주하는 오렌지색 고양이" onError={e=>{e.currentTarget.style.display="none";if(e.currentTarget.nextElementSibling)e.currentTarget.nextElementSibling.style.display="block";}}/><span className="cat-fallback">🐈🎸</span><i>✳</i><b>✦</b></div>;
+}
+
+export default function Home() {
+  const [nickname,setNickname]=useState("");
+  const [visitorId,setVisitorId]=useState("");
+  const [draft,setDraft]=useState("");
+  const [welcome,setWelcome]=useState(false);
+  const [ready,setReady]=useState(false);
+  const [checked,setChecked]=useState(false);
+  const [setupMessage,setSetupMessage]=useState("");
+  const [cheerMessage,setCheerMessage]=useState("");
+  const [shareMessage,setShareMessage]=useState("");
+  const seenCheerIds=useRef(new Set());
+  const [cheers,setCheers]=useState([]);
+  const [cheerCount,setCheerCount]=useState(0);
+  const [floating,setFloating]=useState([]);
+  const [question,setQuestion]=useState("");
+  const [questionInfo,setQuestionInfo]=useState("");
+  const [attendance,setAttendance]=useState("yes");
+  const [people,setPeople]=useState("1");
+  const [afterMessage,setAfterMessage]=useState("");
+  const [rsvpInfo,setRsvpInfo]=useState("");
+  const [summary,setSummary]=useState({yes:0,maybe:0,no:0});
+  const [videoError,setVideoError]=useState(false);
+  const [overlayMounted,setOverlayMounted]=useState(false);
+  const siteUrl="https://daeil-band.vercel.app";
+  const {scrollYProgress}=useScroll();
+  const progress=useSpring(scrollYProgress,{stiffness:100,damping:30,restDelta:.001});
+
+  const registerVisitor=async(id,name)=>{
+    try{
+      const response=await fetch("/api/visitors",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({visitorId:id,nickname:name})});
+      const data=await response.json();
+      if(!response.ok){setSetupMessage(data.error||"방문자 등록에 실패했어요.");return false;}
+      return true;
+    }catch{
+      setSetupMessage("방문자 등록 서버에 연결할 수 없어요.");
+      return false;
+    }
+  };
+
+  useEffect(()=>{
     setOverlayMounted(true);
     let active=true;
     const saved=localStorage.getItem("band-night-name");
@@ -85,14 +135,19 @@ function Countdown() {
         if(fresh.length){
           const effects=fresh.map((item,index)=>({id:item.id,emoji:item.emoji,nickname:item.nickname||"관객",x:8+((index*17+Math.random()*20)%84)}));
           setFloating(current=>[...effects,...current].slice(0,30));
-          effects.forEach(item=>window.setTimeout(()=>setFloating(current=>current.filter(value=>value.id!==item.id),4400));
+          effects.forEach(item=>window.setTimeout(()=>setFloating(current=>current.filter(value=>value.id!==item.id)),4400));
         }
       }catch{
         if(active&&initialSnapshotLoaded)setCheerMessage("응원 기록을 서버에서 불러오지 못했어요.");
       }
     };
     const loadRsvp=async()=>{
-      try{const response=await fetch("/api/rsvp",{cache:"no-store"});if(!response.ok)return;const data=await response.json();if(active&&data.summary)setSummary(data.summary);}catch{}
+      try{
+        const response=await fetch("/api/rsvp",{cache:"no-store"});
+        if(!response.ok)return;
+        const data=await response.json();
+        if(active&&data.summary)setSummary(data.summary);
+      }catch{}
     };
     loadStatus();
     refreshLive().then(()=>{initialSnapshotLoaded=true;});
@@ -101,10 +156,19 @@ function Countdown() {
     return()=>{active=false;window.clearInterval(poll);};
   },[]);
 
-  const saveName=async e=>{e.preventDefault();const n=draft.trim().slice(0,14)||randomName();localStorage.setItem("band-night-name",n);setNickname(n);setWelcome(false);if(visitorId)await registerVisitor(visitorId,n);};
+  const saveName=async e=>{
+    e.preventDefault();
+    const name=draft.trim().slice(0,14)||randomName();
+    localStorage.setItem("band-night-name",name);
+    setNickname(name);
+    setWelcome(false);
+    if(visitorId)await registerVisitor(visitorId,name);
+  };
+
   const cheer=async emoji=>{
     playCheerSound();
     if(!ready){setCheerMessage(setupMessage||"응원 저장 서버가 연결되지 않았어요.");return;}
+    if(!visitorId){setCheerMessage("방문자 정보를 준비하고 있어요. 잠시 후 다시 눌러 주세요.");return;}
     setCheerMessage("");
     try{
       const response=await fetch("/api/cheers",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({visitorId,emoji})});
@@ -115,11 +179,12 @@ function Countdown() {
         seenCheerIds.current.add(item.id);
         setCheers(current=>[item,...current.filter(value=>value.id!==item.id)].slice(0,30));
         setFloating(current=>[{id:item.id,emoji:item.emoji,nickname:item.nickname||nickname,x:22+Math.random()*56},...current].slice(0,24));
-        window.setTimeout(()=>setFloating(current=>current.filter(value=>value.id!==item.id)),2400);
+        window.setTimeout(()=>setFloating(current=>current.filter(value=>value.id!==item.id)),4400);
       }
       setCheerCount(count=>count+1);
     }catch(error){setCheerMessage(error.message||"응원을 저장하지 못했어요.");}
   };
+
   const sharePage=async()=>{
     const shareData={title:"대일밴드 공연 안내",text:"2026년 11월 21일, 대일밴드 공연에서 만나요!",url:siteUrl};
     try{
@@ -128,18 +193,33 @@ function Countdown() {
       else setShareMessage(siteUrl);
     }catch(error){if(error.name!=="AbortError")setShareMessage("공유에 실패했어요. QR 코드를 이용해 주세요.");}
   };
+
   const ask=async e=>{
-    e.preventDefault();if(!question.trim())return;
-    if(!ready){setQuestionInfo(setupMessage||"메시지 전송 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.");return;}
+    e.preventDefault();
+    if(!question.trim())return;
+    if(!ready){setQuestionInfo(setupMessage||"메시지 전송 서버에 연결할 수 없어요.");return;}
+    if(!visitorId){setQuestionInfo("방문자 정보를 준비하고 있어요. 잠시 후 다시 시도해 주세요.");return;}
     setQuestionInfo("전송 중...");
-    try{const r=await fetch("/api/questions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body:question.trim(),visitorId})});const d=await r.json();if(!r.ok)throw Error(d.error);setQuestion("");setQuestionInfo("메시지를 전달했어요. 고마워요!");}
-    catch(e){setQuestionInfo(e.message||"전송에 실패했어요.");}
+    try{
+      const response=await fetch("/api/questions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({body:question.trim(),visitorId})});
+      const data=await response.json();
+      if(!response.ok)throw Error(data.error);
+      setQuestion("");setQuestionInfo("메시지를 전달했어요. 고마워요!");
+    }catch(error){setQuestionInfo(error.message||"전송에 실패했어요.");}
   };
+
   const rsvp=async e=>{
-    e.preventDefault();if(!ready){setRsvpInfo(setupMessage||"응답 서버가 아직 연결되지 않았어요.");return;}
+    e.preventDefault();
+    if(!ready){setRsvpInfo(setupMessage||"응답 서버에 연결할 수 없어요.");return;}
+    if(!visitorId){setRsvpInfo("방문자 정보를 준비하고 있어요. 잠시 후 다시 시도해 주세요.");return;}
     setRsvpInfo("저장 중...");
-    try{const r=await fetch("/api/rsvp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({visitorId,nickname,attendance,headcount:attendance==="yes"?Number(people):0,message:afterMessage.trim()})});const d=await r.json();if(!r.ok)throw Error(d.error);setRsvpInfo("참석 응답을 저장했어요. 고마워요!");if(d.summary)setSummary(d.summary);}
-    catch(e){setRsvpInfo(e.message||"저장에 실패했어요.");}
+    try{
+      const response=await fetch("/api/rsvp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({visitorId,nickname,attendance,headcount:attendance==="yes"?Number(people):0,message:afterMessage.trim()})});
+      const data=await response.json();
+      if(!response.ok)throw Error(data.error);
+      setRsvpInfo("참석 응답을 저장했어요. 고마워요!");
+      if(data.summary)setSummary(data.summary);
+    }catch(error){setRsvpInfo(error.message||"저장에 실패했어요.");}
   };
 
   return <><main className="shell">
