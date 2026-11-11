@@ -70,7 +70,7 @@ export default function HostPage(){
      <div className="host-list-head"><b>받은 메시지 ({items.length})</b><button onClick={load} disabled={busy}><RefreshCw size={13}/> 새로고침</button></div>
      {items.length===0?<p className="host-empty">아직 도착한 메시지가 없어요.</p>:items.map(item=>
       <article key={item.id}>
-       <div><span>{item.nickname||"관객"}</span><time>{new Date(item.created_at).toLocaleString("ko-KR")}</time><b>{item.answer?"답변 완료":"미답변"}</b></div>
+       <div><span>{item.nickname&&item.nickname!=="익명의 관객"?item.nickname:"관객"}</span><time>{new Date(item.created_at).toLocaleString("ko-KR")}</time><b>{item.answer?"답변 완료":"미답변"}</b></div>
        <p>{item.body}</p>
        {item.answer?<aside><CheckCircle2 size={15}/>{item.answer}</aside>:
         <section><input value={answers[item.id]||""} onChange={event=>setAnswers(current=>({...current,[item.id]:event.target.value}))} placeholder="답변 입력"/><button disabled={busy||!(answers[item.id]||"").trim()} onClick={()=>answer(item.id)}><Send size={14}/> 답변</button></section>}
