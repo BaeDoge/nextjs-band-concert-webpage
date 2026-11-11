@@ -9,6 +9,8 @@ export default function HostPage(){
  const[key,setKey]=useState("");
  const[ok,setOk]=useState(false);
  const[stats,setStats]=useState({});
+ const[rsvps,setRsvps]=useState([]);
+ const[galleryEnabled,setGalleryEnabled]=useState(true);
  const[visitors,setVisitors]=useState([]);
  const[messages,setMessages]=useState([]);
  const[answers,setAnswers]=useState({});
@@ -24,8 +26,18 @@ export default function HostPage(){
    const response=await fetch("/api/admin",{headers:{"x-admin-key":key},cache:"no-store"});
    const data=await response.json();
    if(!response.ok)throw Error(data.error||"관리자 정보를 불러오지 못했어요.");
-   setStats(data.stats||{});setVisitors(data.visitors||[]);setMessages(data.messages||[]);setOk(true);
+   setStats(data.stats||{});setVisitors(data.visitors||[]);setMessages(data.messages||[]);setRsvps(data.rsvps||[]);setGalleryEnabled(data.settings?.gallery_enabled??true);setOk(true);
   }catch(e){setOk(false);setError(e.message||"관리자 인증에 실패했어요.");}
+  finally{setBusy(false);}
+ }
+
+ async function toggleGallery(){
+  const next=!galleryEnabled;setBusy(true);setError("");setNotice("");
+  try{
+   const response=await fetch("/api/settings",{method:"PATCH",headers:{"Content-Type":"application/json","x-admin-key":key},body:JSON.stringify({galleryEnabled:next})});
+   const data=await response.json();if(!response.ok)throw Error(data.error||"갤러리 설정을 저장하지 못했어요.");
+   setGalleryEnabled(Boolean(data.settings.gallery_enabled));setNotice(next?"활동사진 캐로셀이 공개 페이지에 표시됩니다.":"활동사진 캐로셀이 공개 페이지에서 숨겨졌습니다.");
+  }catch(e){setError(e.message||"설정을 저장하지 못했어요.");}
   finally{setBusy(false);}
  }
 
@@ -124,9 +136,27 @@ export default function HostPage(){
       </article>
      )}</div>}
     </section>
+    <section className="host-panel host-gallery-toggle">
+     <div className="host-panel-head"><div><small>ACTIVITY PHOTO CAROUSEL</small><h2>활동사진 캐로셀</h2><p>공개 공연 페이지 하단에 활동사진을 표시할지 설정합니다.</p></div>
+      <button className={galleryEnabled?"host-unblock":"host-block"} onClick={toggleGallery} disabled={busy}>{galleryEnabled?"ON · 표시 중":"OFF · 숨김"}</button>
+     </div>
+     <p className="host-footnote">설정은 Supabase에 저장되며 모든 관객에게 동일하게 적용됩니다.</p>
+    </section>
+
     <section className="host-panel host-rsvp-summary">
      <div className="host-panel-head"><div><small>AFTER PARTY RSVP</small><h2>뒤풀이 응답</h2></div></div>
      <div><span>참석 {Number(rsvp.yes||0)}명</span><span>미정 {Number(rsvp.maybe||0)}명</span><span>불참 {Number(rsvp.no||0)}명</span></div>
+    </section>
+    <section className="host-panel host-rsvp-list">
+     <div className="host-panel-head"><div><small>GUEST RSVP DETAIL</small><h2>뒤풀이 응답자</h2><p>닉네임별 참석 여부와 신청 인원을 확인합니다.</p></div><span className="host-count">{rsvps.length}건</span></div>
+     {rsvps.length===0?<p className="host-empty">아직 등록된 뒤풀이 응답이 없습니다.</p>:<div className="host-rsvp-rows">{rsvps.map(item=>
+      <article key={item.visitor_id}>
+       <div><strong>{item.nickname||"관객"}</strong><span className={"host-rsvp-status "+item.attendance}>{item.attendance==="yes"?"참석":item.attendance==="maybe"?"미정":"불참"}</span></div>
+       <b>{item.attendance==="yes"?(Number(item.headcount||1)+"명 참석"):(item.attendance==="maybe"?"참석 미정":"불참")}</b>
+       {item.message&&<p>{item.message}</p>}
+       <time>{item.updated_at?new Date(item.updated_at).toLocaleString("ko-KR"):"-"}</time>
+      </article>
+     )}</div>}
     </section>
    </>
   }
