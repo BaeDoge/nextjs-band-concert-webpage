@@ -458,3 +458,11 @@ button,input,textarea,select{font-family:inherit}
 @media(max-width:420px){
  .activity-marquee-track img{height:126px}
 }
+
+.host-user-actions{display:flex;align-items:center;gap:7px;flex:none}
+.host-delete{display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;border:1px solid rgba(150,56,39,.15);border-radius:4px;padding:9px 11px;background:#f3dfd9;color:#a24330;font-size:10px}
+.host-delete:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:800px){
+ .host-user-actions{flex-direction:column;align-items:stretch;gap:6px}
+ .host-user-actions button{justify-content:center;padding:8px 9px;font-size:9px}
+}
