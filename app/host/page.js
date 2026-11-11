@@ -1,30 +1,31 @@
 "use client";
-import {useState} from "react";
+import {useMemo,useState} from "react";
 import Link from "next/link";
-import {ArrowLeft,LockKeyhole,Send,CheckCircle2,RefreshCw,Trash2,Heart} from "lucide-react";
+import {ArrowLeft,LockKeyhole,Send,CheckCircle2,RefreshCw,Trash2,Heart,Users,MessageSquare,ShieldBan,ShieldCheck,Search} from "lucide-react";
+
+const emojiLabels={"🔥":"불꽃","👏":"박수","💛":"하트","🎸":"기타","🐈":"고양이","✨":"반짝"};
 
 export default function HostPage(){
  const[key,setKey]=useState("");
  const[ok,setOk]=useState(false);
- const[items,setItems]=useState([]);
+ const[stats,setStats]=useState({});
+ const[visitors,setVisitors]=useState([]);
+ const[messages,setMessages]=useState([]);
  const[answers,setAnswers]=useState({});
+ const[search,setSearch]=useState("");
+ const[reason,setReason]=useState("운영자에 의해 차단됨");
  const[error,setError]=useState("");
  const[notice,setNotice]=useState("");
  const[busy,setBusy]=useState(false);
- const[cheerTotal,setCheerTotal]=useState(0);
 
  async function load(){
   setBusy(true);setError("");setNotice("");
   try{
-   const[q,c]=await Promise.all([
-    fetch("/api/questions",{headers:{"x-admin-key":key},cache:"no-store"}),
-    fetch("/api/cheers",{cache:"no-store"})
-   ]);
-   const qData=await q.json();
-   if(!q.ok)throw Error(qData.error||"운영자 인증에 실패했어요.");
-   const cData=c.ok?await c.json():{total:0};
-   setItems(qData.items||[]);setCheerTotal(Number(cData.total||0));setOk(true);
-  }catch(e){setOk(false);setError(e.message||"정보를 불러오지 못했어요.");}
+   const response=await fetch("/api/admin",{headers:{"x-admin-key":key},cache:"no-store"});
+   const data=await response.json();
+   if(!response.ok)throw Error(data.error||"관리자 정보를 불러오지 못했어요.");
+   setStats(data.stats||{});setVisitors(data.visitors||[]);setMessages(data.messages||[]);setOk(true);
+  }catch(e){setOk(false);setError(e.message||"관리자 인증에 실패했어요.");}
   finally{setBusy(false);}
  }
 
@@ -39,43 +40,93 @@ export default function HostPage(){
   finally{setBusy(false);}
  }
 
- async function resetCheers(){
-  if(!window.confirm("누적 응원 기록 "+cheerTotal+"건을 모두 삭제하고 0으로 초기화할까요? 이 작업은 되돌릴 수 없습니다."))return;
+ async function toggleBlock(visitor){
+  const next=!visitor.blocked;
+  const promptReason=next?(window.prompt("차단 사유를 입력하세요. (선택)",reason)||"운영자에 의해 차단됨"):"";
+  if(next&&!window.confirm(visitor.nickname+" 님의 이 브라우저 ID를 차단할까요?"))return;
+  if(!next&&!window.confirm(visitor.nickname+" 님의 차단을 해제할까요?"))return;
   setBusy(true);setError("");setNotice("");
   try{
-   const response=await fetch("/api/cheers",{method:"DELETE",headers:{"x-admin-key":key}});
-   const data=await response.json();if(!response.ok)throw Error(data.error||"응원 초기화에 실패했어요.");
-   setCheerTotal(0);setNotice("응원 기록을 초기화했어요.");
+   const response=await fetch("/api/visitors",{method:"PATCH",headers:{"Content-Type":"application/json","x-admin-key":key},body:JSON.stringify({visitorId:visitor.visitor_id,blocked:next,reason:promptReason})});
+   const data=await response.json();if(!response.ok)throw Error(data.error||"차단 상태를 변경하지 못했어요.");
+   setNotice(next?"해당 브라우저 ID를 차단했어요.":"차단을 해제했어요.");await load();
   }catch(e){setError(e.message);}
   finally{setBusy(false);}
  }
 
- return <main className="host">
+ async function resetCheers(){
+  if(!window.confirm("누적 응원 기록 "+Number(stats.total_cheers||0)+"건을 모두 삭제할까요? 이 작업은 되돌릴 수 없습니다."))return;
+  setBusy(true);setError("");setNotice("");
+  try{
+   const response=await fetch("/api/cheers",{method:"DELETE",headers:{"x-admin-key":key}});
+   const data=await response.json();if(!response.ok)throw Error(data.error||"응원 초기화에 실패했어요.");
+   setNotice("응원 기록을 초기화했어요.");await load();
+  }catch(e){setError(e.message);}
+  finally{setBusy(false);}
+ }
+
+ const filteredVisitors=useMemo(()=>{
+  const q=search.trim().toLowerCase();
+  if(!q)return visitors;
+  return visitors.filter(v=>String(v.nickname||"").toLowerCase().includes(q)||v.visitor_id.toLowerCase().includes(q));
+ },[visitors,search]);
+
+ const rsvp=stats.rsvp||{};
+ const cheerRows=Object.entries(stats.cheers_by_emoji||{}).sort((a,b)=>b[1]-a[1]);
+ const maxCheer=Math.max(1,...cheerRows.map(([,count])=>Number(count)));
+
+ return <main className="host host-dashboard">
   <Link href="/" className="host-back"><ArrowLeft size={16}/> 공연 페이지로</Link>
-  <header><small>대일밴드 운영자</small><h1>관리자 <em>페이지</em></h1><p>메시지를 확인하고 관객 응원 기록을 관리합니다.</p></header>
+  <header><small>DAEIL BAND · PRIVATE ADMIN</small><h1>운영자 <em>대시보드</em></h1><p>참여자, 응원, 메시지 및 사용자 관리를 확인합니다.</p></header>
   {!ok?
    <form className="host-login" onSubmit={event=>{event.preventDefault();load();}}>
     <LockKeyhole size={28}/><label htmlFor="secret">관리자 접근 키</label>
-    <input id="secret" type="password" value={key} onChange={event=>setKey(event.target.value)} placeholder="ADMIN_ACCESS_KEY" required/>
+    <input id="secret" type="password" value={key} onChange={event=>setKey(event.target.value)} placeholder="ADMIN_ACCESS_KEY" required autoComplete="current-password"/>
     <button disabled={busy}>{busy?"확인 중...":"관리자 페이지 열기"}</button>
    </form>
    :
    <>
-    <section className="host-cheers">
-     <div><Heart size={20}/><span>누적 응원 수</span><strong>{cheerTotal.toLocaleString("ko-KR")}</strong></div>
-     <button className="host-reset" onClick={resetCheers} disabled={busy||cheerTotal===0}><Trash2 size={15}/> 응원 횟수 초기화</button>
-     <p>초기화하면 관객 화면의 누적 숫자도 0으로 반영됩니다. 이미 화면에 떠 있는 응원 애니메이션은 잠시 후 사라집니다.</p>
+    <div className="host-toolbar"><span>마지막 조회: {new Date().toLocaleTimeString("ko-KR")}</span><button onClick={load} disabled={busy}><RefreshCw size={14}/> 새로고침</button></div>
+    <section className="host-stat-grid">
+     <article><Users/><small>등록 방문자</small><strong>{Number(stats.total_visitors||0).toLocaleString("ko-KR")}</strong><span>고유 닉네임 {Number(stats.unique_nicknames||0).toLocaleString("ko-KR")}개</span></article>
+     <article><Heart/><small>누적 응원</small><strong>{Number(stats.total_cheers||0).toLocaleString("ko-KR")}</strong><span>이모티콘 응원 전체</span></article>
+     <article><MessageSquare/><small>메시지</small><strong>{Number(stats.total_messages||0).toLocaleString("ko-KR")}</strong><span>미답변 {Number(stats.pending_messages||0)}건</span></article>
+     <article><ShieldBan/><small>차단 방문자</small><strong>{Number(stats.blocked_visitors||0).toLocaleString("ko-KR")}</strong><span>브라우저 ID 기준</span></article>
     </section>
-    <section className="host-list">
-     <div className="host-list-head"><b>받은 메시지 ({items.length})</b><button onClick={load} disabled={busy}><RefreshCw size={13}/> 새로고침</button></div>
-     {items.length===0?<p className="host-empty">아직 도착한 메시지가 없어요.</p>:items.map(item=>
+
+    <section className="host-panel">
+     <div className="host-panel-head"><div><small>REACTION ANALYTICS</small><h2>감정 표현 통계</h2></div><button className="host-reset" onClick={resetCheers} disabled={busy||!Number(stats.total_cheers)}><Trash2 size={14}/> 응원 기록 초기화</button></div>
+     {cheerRows.length===0?<p className="host-empty">아직 응원 기록이 없습니다.</p>:<div className="host-reaction-grid">{cheerRows.map(([emoji,count])=><div className="host-reaction" key={emoji}><div><strong>{emoji}</strong><b>{Number(count).toLocaleString("ko-KR")}</b></div><span>{emojiLabels[emoji]||"응원"}</span><div className="host-bar"><i style={{width:(Number(count)/maxCheer*100)+"%"}}/></div></div>)}</div>}
+    </section>
+
+    <section className="host-panel">
+     <div className="host-panel-head"><div><small>GUEST MANAGEMENT</small><h2>참여자 목록</h2><p>등록된 브라우저별 닉네임과 응원 활동입니다.</p></div><span className="host-count">{visitors.length}명 표시</span></div>
+     <div className="host-search"><Search size={16}/><input value={search} onChange={event=>setSearch(event.target.value)} placeholder="닉네임 또는 사용자 ID 검색"/></div>
+     <div className="host-users">
+      {filteredVisitors.length===0?<p className="host-empty">검색 결과가 없습니다.</p>:filteredVisitors.map(visitor=>
+       <article className={visitor.blocked?"host-user is-blocked":"host-user"} key={visitor.visitor_id}>
+        <div className="host-user-main"><strong>{visitor.nickname||"관객"}</strong><small>응원 {Number(visitor.cheer_count||0)}회 · 최근 접속 {visitor.last_seen?new Date(visitor.last_seen).toLocaleString("ko-KR"):"-"}</small>{visitor.blocked&&<em>차단됨 · {visitor.block_reason||"사유 미입력"}</em>}</div>
+        <button className={visitor.blocked?"host-unblock":"host-block"} disabled={busy} onClick={()=>toggleBlock(visitor)}>{visitor.blocked?<><ShieldCheck size={14}/> 차단 해제</>:<><ShieldBan size={14}/> 차단</>}</button>
+       </article>
+      )}
+     </div>
+     <p className="host-footnote">차단은 방문자 ID(현재 브라우저)에 적용됩니다. 시크릿 모드나 다른 기기에서 새 ID를 만들면 우회할 수 있습니다.</p>
+    </section>
+
+    <section className="host-panel">
+     <div className="host-panel-head"><div><small>GUEST MESSAGES</small><h2>보내온 메시지</h2><p>메시지 내용과 작성 닉네임을 확인하고 답변할 수 있습니다.</p></div><span className="host-count">{messages.length}건</span></div>
+     {messages.length===0?<p className="host-empty">아직 도착한 메시지가 없어요.</p>:<div className="host-messages">{messages.map(item=>
       <article key={item.id}>
-       <div><span>{item.nickname&&item.nickname!=="익명의 관객"?item.nickname:"관객"}</span><time>{new Date(item.created_at).toLocaleString("ko-KR")}</time><b>{item.answer?"답변 완료":"미답변"}</b></div>
+       <div className="host-message-meta"><strong>{item.nickname||"관객"}</strong><time>{new Date(item.created_at).toLocaleString("ko-KR")}</time><b>{item.answer?"답변 완료":"미답변"}</b></div>
        <p>{item.body}</p>
-       {item.answer?<aside><CheckCircle2 size={15}/>{item.answer}</aside>:
-        <section><input value={answers[item.id]||""} onChange={event=>setAnswers(current=>({...current,[item.id]:event.target.value}))} placeholder="답변 입력"/><button disabled={busy||!(answers[item.id]||"").trim()} onClick={()=>answer(item.id)}><Send size={14}/> 답변</button></section>}
+       {item.answer?<aside><CheckCircle2 size={15}/>{item.answer}</aside>:<div className="host-answer-form"><input value={answers[item.id]||""} onChange={event=>setAnswers(current=>({...current,[item.id]:event.target.value}))} placeholder="답변 입력"/><button disabled={busy||!(answers[item.id]||"").trim()} onClick={()=>answer(item.id)}><Send size={14}/> 답변</button></div>}
+       {item.visitor_id?<div className="host-message-actions"><small>ID {item.visitor_id.slice(0,8)}…</small><button onClick={()=>toggleBlock(visitors.find(v=>v.visitor_id===item.visitor_id)||{visitor_id:item.visitor_id,nickname:item.nickname,blocked:false})} disabled={busy}><ShieldBan size={13}/> 작성자 차단</button></div>:<small className="host-footnote">기존 기록: 방문자 ID가 저장되기 전의 메시지라 사용자 차단과 연결할 수 없습니다.</small>}
       </article>
-     )}
+     )}</div>}
+    </section>
+    <section className="host-panel host-rsvp-summary">
+     <div className="host-panel-head"><div><small>AFTER PARTY RSVP</small><h2>뒤풀이 응답</h2></div></div>
+     <div><span>참석 {Number(rsvp.yes||0)}명</span><span>미정 {Number(rsvp.maybe||0)}명</span><span>불참 {Number(rsvp.no||0)}명</span></div>
     </section>
    </>
   }
