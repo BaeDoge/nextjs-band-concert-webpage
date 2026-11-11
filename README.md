@@ -133,3 +133,10 @@ Run `supabase/migrations/20261112_gallery_settings.sql` once in Supabase SQL Edi
 The six photos uploaded for the event are downscaled and embedded in `public/images/activity-gallery.svg.gz` as small JPEG thumbnails. They are rendered in a non-clickable, continuous marquee under the final invitation panel. Browser context-menu and drag interactions are suppressed to discourage casual saving; public images cannot be made technically impossible to download because a browser must receive the image bytes to display them.
 
 The gallery is a single compressed SVG strip (about 14 KB compressed, about 23 KB uncompressed) repeated twice for a seamless left-to-right marquee.
+
+
+## Latest activity gallery and visitor deletion
+
+- The gallery strip is regenerated from the uploaded original photos as a higher-resolution WebP asset at `public/images/activity-gallery.webp`. To add more activity photos, upload the new images and regenerate this single horizontal strip with the originals, then replace the asset and keep the two-track marquee in `app/page.js`.
+- The strip is rendered as a non-clickable WebP and cached for one year. The marquee takes about 42 seconds per desktop loop and 34 seconds on mobile.
+- Admin visitor deletion uses the SQL function in `supabase/migrations/20261112_visitor_delete.sql`. Run this once in the Supabase SQL Editor before using the Delete button. It atomically deletes the matching visitor record and all linked cheers, messages and RSVP data. The admin page displays a confirmation with associated record counts before requesting deletion.
