@@ -155,3 +155,27 @@ The duplicated image sequence makes the marquee loop seamlessly. Desktop speed i
 ## Admin visitor deletion
 
 Before using the visitor Delete button for the first time, execute `supabase/migrations/20261112_visitor_delete.sql` once in Supabase SQL Editor. This creates a server-only RPC that atomically removes the selected visitor and their linked cheers, questions and RSVP. The admin confirmation displays the associated record counts. This cannot be undone.
+
+
+## Post-show archive mode (Supabase-independent)
+
+The event ends at **2026-11-21 21:00 Asia/Seoul**. Before that time, the hero displays the countdown. During 18:00–21:00 it switches to a live-show message. At and after 21:00 it displays `THANKS FOR COMING` and the elapsed day count (`D+0`, `D+1`, ...).
+
+After 21:00 on the event date, the public page intentionally stops calling all Supabase-backed visitor, cheers, RSVP, and gallery-setting endpoints. Name registration, reactions, questions and RSVP controls are hidden; the static story, set list, schedule, members, existing activity-photo carousel, share panel and post-show photo archive remain available. This avoids relying on a sleeping Supabase project for the keepsake page.
+
+### Add post-concert photos
+
+Upload optimized WebP images to `public/images/memories/` and list their public paths in the `memoryPhotos` array near the top of `app/page.js`, for example:
+
+```js
+const memoryPhotos = [
+  "/images/memories/show-01.webp",
+  "/images/memories/show-02.webp",
+];
+```
+
+The `MEMORIES` section appears automatically in post-show mode and builds a responsive photo grid from this static list. No Supabase storage or active database is required.
+
+### Admin page easter egg
+
+The host dashboard is reachable by clicking the mascot cat below the sharing QR panel five times. The `/host` route remains available directly as well.
