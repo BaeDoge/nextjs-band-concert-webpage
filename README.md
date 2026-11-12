@@ -163,18 +163,51 @@ The event ends at **2026-11-21 21:00 Asia/Seoul**. Before that time, the hero di
 
 After 21:00 on the event date, the public page intentionally stops calling all Supabase-backed visitor, cheers, RSVP, and gallery-setting endpoints. Name registration, reactions, questions and RSVP controls are hidden; the static story, set list, schedule, members, existing activity-photo carousel, share panel and post-show photo archive remain available. This avoids relying on a sleeping Supabase project for the keepsake page.
 
-### Add post-concert photos
+### Post-concert photo archive (GitHub + Vercel static files)
 
-Upload optimized WebP images to `public/images/memories/` and list their public paths in the `memoryPhotos` array near the top of `app/page.js`, for example:
+The post-show `MEMORIES` gallery is deliberately independent of Supabase. Photos are served as static files from this repository, so the archive remains viewable even if the Supabase project is paused or asleep.
+
+#### Add photos
+
+1. Prepare copies of the concert photos as WebP (recommended maximum long edge: 1600px; quality: 82–88). Keep the original full-resolution files separately as your backup.
+2. Add the WebP files to `public/images/memories/`. Use simple, unique names such as `2026-11-21-stage-01.webp`. Avoid spaces and Korean characters in filenames.
+3. Edit the `memoryPhotos` array near the top of `app/page.js` and add each image path and optional caption:
 
 ```js
 const memoryPhotos = [
-  "/images/memories/show-01.webp",
-  "/images/memories/show-02.webp",
+  {
+    src: "/images/memories/2026-11-21-stage-01.webp",
+    caption: "대일밴드 첫 무대",
+  },
+  {
+    src: "/images/memories/2026-11-21-finale-02.webp",
+    caption: "함께한 마지막 곡",
+  },
 ];
 ```
 
-The `MEMORIES` section appears automatically in post-show mode and builds a responsive photo grid from this static list. Each object can include a caption. No Supabase storage or active database is required. Keep the original photo files in this directory and export resized WebP copies (around 1200px maximum edge, quality 78–85) for the site.
+4. Preview locally with `npm run dev`, then commit and push both the image files and the updated `app/page.js`.
+5. Vercel automatically builds the new deployment. After it finishes, open `https://daeil-band.vercel.app` and check the `MEMORIES` section.
+
+#### Windows CMD example
+
+Run these commands from the repository root after copying the new images into `public/images/memories/` and editing `app/page.js`:
+
+```bat
+git status
+git add public/images/memories app/page.js
+git commit -m "content: add Daeil Band concert memories"
+git push origin main
+```
+
+The gallery is rendered only in post-show mode (after the scheduled show end). Before then, the existing activity-photo carousel remains separate. Adding a file to the folder alone does not make it appear: the path must also be listed in `memoryPhotos`. Captions are optional. No Supabase Storage bucket, database table, upload API, or runtime database request is needed.
+
+#### Photo quality and privacy
+
+- Prefer WebP copies with a maximum long edge of 1600px; 1200px is also fine for smaller file sizes.
+- Use descriptive, sequential filenames and avoid overwriting old photos unless intended.
+- Check that everyone shown is comfortable with the photos being published on a public website. Avoid posting private contact details, backstage credentials, or photos someone has asked not to share.
+- The repository and deployed site are public. Anyone can view and download public image files; CSS or disabled right-click cannot prevent downloading.
 
 ### Admin page easter egg
 
