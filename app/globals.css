@@ -478,3 +478,65 @@ button,input,textarea,select{font-family:inherit}
 @media(max-width:420px){
  .activity-marquee-track img{height:132px}
 }
+
+
+/* Countdown states: pre-show, live show, and a persistent post-show keepsake */
+.hero-countdown .countdown-wrap,
+.hero-countdown .countdown-live,
+.hero-countdown .countdown-after{display:flex;flex-direction:column;align-items:center;gap:10px}
+.hero-countdown .countdown-wrap>span,
+.hero-countdown .countdown-live>span,
+.hero-countdown .countdown-after>span{display:block;font-size:11px;letter-spacing:.18em;color:rgba(255,255,255,.58);margin:0 0 2px}
+.hero-countdown .countdown-wrap>small,
+.hero-countdown .countdown-live>small,
+.hero-countdown .countdown-after>small{display:block;margin:3px 0 0;font-size:12px;line-height:1.7;letter-spacing:.04em;color:rgba(255,255,255,.66)}
+.hero-countdown .countdown-live strong{font:800 clamp(30px,5vw,54px)/1 var(--display);letter-spacing:.04em;color:#fff}
+.hero-countdown .countdown-live>span{color:var(--orange2)}
+.hero-countdown .countdown-after strong{font:800 clamp(64px,10vw,112px)/.95 var(--mono);letter-spacing:-.08em;color:#fff}
+.hero-countdown .countdown-after>span{color:var(--orange2)}
+.hero-countdown .countdown-after>small{max-width:90%;font-size:13px}
+
+/* Post-event photo archive is static and does not use Supabase */
+.memory-archive{background:#eee6da;color:#211d19}
+.memory-archive-head{max-width:760px;margin:44px auto 34px;text-align:center}
+.memory-archive-head h2{font:900 clamp(48px,8vw,88px)/.95 var(--display);letter-spacing:-.085em;margin:12px 0 18px}
+.memory-archive-head h2 em{color:#c46f4e;font-style:normal}
+.memory-archive-head>p:last-child{font-size:14px;line-height:1.8;color:#7f7469}
+.memory-empty{min-height:220px;display:flex;align-items:center;justify-content:center;gap:28px;padding:28px;border:1px dashed rgba(40,32,26,.2);background:rgba(255,255,255,.28);text-align:left}
+.memory-empty-cat{width:105px;height:115px;flex:none}
+.memory-empty>div>b{font:700 11px var(--mono);letter-spacing:.16em;color:#c46f4e}
+.memory-empty>div>p{margin:10px 0 0;font-size:13px;line-height:1.8;color:#766a5e}
+.memory-photo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.memory-photo-grid figure{margin:0;background:#fff;padding:8px;box-shadow:0 8px 24px rgba(28,21,16,.08)}
+.memory-photo-grid img{width:100%;height:clamp(170px,22vw,300px);display:block;object-fit:cover}
+.memory-photo-grid figcaption{padding:10px 3px 3px;font:9px var(--mono);letter-spacing:.12em;color:#938577}
+
+/* Equal-size image cards avoid large empty spaces between portrait and landscape photos */
+.activity-marquee-track{display:flex;flex-wrap:nowrap;width:max-content;gap:0;animation:activity-gallery-to-right 30s linear infinite;will-change:transform}
+.activity-marquee-group{display:flex;flex:none;gap:12px;padding-right:12px}
+.activity-marquee-track img{display:block;flex:none;width:258px;height:166px;margin:0;max-width:none;object-fit:cover;object-position:center;border-radius:6px;background:#201b17;pointer-events:none;user-select:none;-webkit-user-drag:none}
+@keyframes activity-gallery-to-right{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+.host-secret-cat{display:flex;align-items:center;justify-content:center;border:0;padding:0;background:transparent;cursor:pointer}
+.host-secret-cat:focus-visible{outline:2px solid var(--orange);outline-offset:7px;border-radius:8px}
+@media(max-width:800px){
+ .hero-countdown .countdown-live strong{font-size:clamp(28px,7vw,40px)}
+ .hero-countdown .countdown-after strong{font-size:clamp(60px,17vw,84px)}
+ .hero-countdown .countdown-after>small{font-size:12px}
+ .memory-archive-head{margin:32px auto 26px}
+ .memory-empty{min-height:190px;gap:18px;padding:20px}
+ .memory-empty-cat{width:82px;height:94px}
+ .memory-empty>div>p{font-size:12px}
+ .memory-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .memory-photo-grid figure{padding:5px}
+ .memory-photo-grid img{height:clamp(130px,32vw,210px)}
+ .activity-marquee-track{animation-duration:24s}
+ .activity-marquee-group{gap:10px;padding-right:10px}
+ .activity-marquee-track img{width:210px;height:136px}
+}
+@media(max-width:420px){
+ .activity-marquee-track img{width:194px;height:126px}
+ .memory-empty{flex-direction:column;text-align:center}
+}
+@media(prefers-reduced-motion:reduce){
+ .activity-marquee-track{animation:none;transform:translateX(0)}
+}
