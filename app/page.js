@@ -47,9 +47,14 @@ function Reveal({children,className="",delay=0}) {
 const SHOW_START_AT = new Date("2026-11-21T18:00:00+09:00").getTime();
 const SHOW_END_AT = new Date("2026-11-21T21:00:00+09:00").getTime();
 const SHOW_DAY_START = new Date("2026-11-21T00:00:00+09:00").getTime();
+// 공연 후 사진은 public/images/memories/에 추가한 뒤 아래 형식으로 등록합니다.
+// 파일 추가와 이 배열 수정 내용을 함께 GitHub에 push하면 Vercel이 자동 배포합니다.
+// Supabase를 사용하지 않는 정적 갤러리이므로 DB가 휴면 상태여도 사진을 볼 수 있습니다.
 const memoryPhotos = [
-  // 공연 후 사진을 public/images/memories/에 추가하고 아래처럼 경로와 설명을 적어주세요.
-  // { src: "/images/memories/2026-11-21-001.webp", caption: "대일밴드 첫 무대" },
+  // {
+  //   src: "/images/memories/2026-11-21-stage-01.webp",
+  //   caption: "대일밴드 첫 무대",
+  // },
 ];
 
 function Countdown() {
