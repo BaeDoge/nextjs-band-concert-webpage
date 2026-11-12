@@ -511,11 +511,19 @@ button,input,textarea,select{font-family:inherit}
 .memory-photo-grid img{width:100%;height:clamp(170px,22vw,300px);display:block;object-fit:cover}
 .memory-photo-grid figcaption{padding:10px 3px 3px;font:9px var(--mono);letter-spacing:.12em;color:#938577}
 
-/* Equal-size image cards avoid large empty spaces between portrait and landscape photos */
-.activity-marquee-track{display:flex;flex-wrap:nowrap;width:max-content;gap:0;animation:activity-gallery-to-right 30s linear infinite;will-change:transform}
-.activity-marquee-group{display:flex;flex:none;gap:12px;padding-right:12px}
-.activity-marquee-track img{display:block;flex:none;width:258px;height:166px;margin:0;max-width:none;object-fit:cover;object-position:center;border-radius:6px;background:#201b17;pointer-events:none;user-select:none;-webkit-user-drag:none}
+/* Compact, sharper activity carousel: larger image viewport, tighter spacing and faster motion */
+.activity-marquee-track{display:flex;flex-wrap:nowrap;width:max-content;gap:0;animation:activity-gallery-to-right 19s linear infinite;will-change:transform}
+.activity-marquee-group{display:flex;flex:none;gap:8px;padding-right:8px}
+.activity-marquee-track img{display:block;flex:none;width:300px;height:194px;margin:0;max-width:none;object-fit:cover;object-position:center;border-radius:6px;background:#201b17;pointer-events:none;user-select:none;-webkit-user-drag:none}
 @keyframes activity-gallery-to-right{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+@media(max-width:800px){
+ .activity-marquee-track{animation-duration:17s}
+ .activity-marquee-group{gap:6px;padding-right:6px}
+ .activity-marquee-track img{width:248px;height:160px}
+}
+@media(max-width:420px){
+ .activity-marquee-track img{width:224px;height:145px}
+}
 .host-secret-cat{display:flex;align-items:center;justify-content:center;border:0;padding:0;background:transparent;cursor:pointer}
 .host-secret-cat:focus-visible{outline:2px solid var(--orange);outline-offset:7px;border-radius:8px}
 @media(max-width:800px){
