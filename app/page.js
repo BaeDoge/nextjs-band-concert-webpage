@@ -44,14 +44,40 @@ function playCheerSound() {
 function Reveal({children,className="",delay=0}) {
   return <motion.div className={className} initial={{opacity:0,y:32,filter:"blur(7px)"}} whileInView={{opacity:1,y:0,filter:"blur(0px)"}} viewport={{once:true,amount:.15}} transition={{duration:.8,delay,ease:[.22,1,.36,1]}}>{children}</motion.div>;
 }
+const SHOW_START_AT = new Date("2026-11-21T18:00:00+09:00").getTime();
+const SHOW_END_AT = new Date("2026-11-21T21:00:00+09:00").getTime();
+const SHOW_DAY_START = new Date("2026-11-21T00:00:00+09:00").getTime();
+const memoryPhotos = []; // Add post-concert photos under /images/memories and list their paths here.
+
 function Countdown() {
-  const [time,setTime]=useState(null);
+  const [now,setNow]=useState(null);
   useEffect(()=>{
-    const target=new Date("2026-11-21T18:00:00+09:00").getTime();
-    const tick=()=>{const d=Math.max(0,target-Date.now());setTime([Math.floor(d/86400000),Math.floor(d%86400000/3600000),Math.floor(d%3600000/60000),Math.floor(d%60000/1000)]);};
+    const tick=()=>setNow(Date.now());
     tick();const id=setInterval(tick,1000);return()=>clearInterval(id);
   },[]);
-  return <div className="countdown">{(time||[0,0,0,0]).map((v,i)=><div key={i}><b>{String(v).padStart(2,"0")}</b><small>{["일","시간","분","초"][i]}</small></div>)}</div>;
+  if(now===null)return <div className="countdown countdown-loading"><span>DAEIL BAND · 2026</span></div>;
+  if(now>=SHOW_END_AT){
+    const days=Math.max(0,Math.floor((now-SHOW_DAY_START)/86400000));
+    return <div className="countdown-after">
+      <span>THANKS FOR COMING</span>
+      <strong>D+{days}</strong>
+      <small>그날의 함성, 오래도록 기억할게요.</small>
+    </div>;
+  }
+  if(now>=SHOW_START_AT){
+    return <div className="countdown-live">
+      <span>D-DAY · NOV 21</span>
+      <strong>THE SHOW IS ON</strong>
+      <small>오늘의 무대를 함께 즐겨주세요.</small>
+    </div>;
+  }
+  const d=SHOW_START_AT-now;
+  const time=[Math.floor(d/86400000),Math.floor(d%86400000/3600000),Math.floor(d%3600000/60000),Math.floor(d%60000/1000)];
+  return <div className="countdown-wrap">
+    <span>COUNTDOWN TO SHOWTIME</span>
+    <div className="countdown">{time.map((v,i)=><div key={i}><b>{String(v).padStart(2,"0")}</b><small>{["일","시간","분","초"][i]}</small></div>)}</div>
+    <small>2026. 11. 21 · SAT · 18:00</small>
+  </div>;
 }
 function Cat({className=""}) {
   return <div className={"cat-wrap "+className}><img src="/images/guitar-cat.webp" alt="헤드폰을 쓰고 기타를 연주하는 오렌지색 고양이" onError={e=>{e.currentTarget.style.display="none";if(e.currentTarget.nextElementSibling)e.currentTarget.nextElementSibling.style.display="block";}}/><span className="cat-fallback">🐈🎸</span><i>✳</i><b>✦</b></div>;
@@ -81,6 +107,8 @@ export default function Home() {
   const [videoError,setVideoError]=useState(false);
   const [overlayMounted,setOverlayMounted]=useState(false);
   const [galleryEnabled,setGalleryEnabled]=useState(true);
+  const [archiveMode,setArchiveMode]=useState(false);
+  const hostCatTaps=useRef(0);
   const siteUrl="https://daeil-band.vercel.app";
   const {scrollYProgress}=useScroll();
   const progress=useSpring(scrollYProgress,{stiffness:100,damping:30,restDelta:.001});
@@ -99,6 +127,10 @@ export default function Home() {
 
   useEffect(()=>{
     setOverlayMounted(true);
+    const syncArchiveMode=()=>setArchiveMode(Date.now()>=SHOW_END_AT);
+    syncArchiveMode();
+    const archiveTimer=window.setInterval(syncArchiveMode,30000);
+    if(Date.now()>=SHOW_END_AT)return()=>window.clearInterval(archiveTimer);
     let active=true;
     const saved=localStorage.getItem("band-night-name");
     const initialName=saved||randomName();
@@ -123,7 +155,7 @@ export default function Home() {
       }
     };
     const refreshLive=async()=>{
-      if(document.visibilityState!=="visible")return;
+      if(Date.now()>=SHOW_END_AT||document.visibilityState!=="visible")return;
       try{
         const response=await fetch("/api/live",{cache:"no-store"});
         if(!response.ok)throw new Error("응원 기록을 불러오지 못했어요.");
@@ -144,6 +176,7 @@ export default function Home() {
       }
     };
     const loadRsvp=async()=>{
+      if(Date.now()>=SHOW_END_AT)return;
       try{
         const response=await fetch("/api/rsvp",{cache:"no-store"});
         if(!response.ok)return;
@@ -152,6 +185,7 @@ export default function Home() {
       }catch{}
     };
     const loadGallerySetting=async()=>{
+      if(Date.now()>=SHOW_END_AT)return;
       try{
         const response=await fetch("/api/gallery",{cache:"no-store"});
         if(!response.ok)return;
@@ -165,7 +199,7 @@ export default function Home() {
     loadGallerySetting();
     const poll=window.setInterval(refreshLive,10000);
     const galleryPoll=window.setInterval(loadGallerySetting,30000);
-    return()=>{active=false;window.clearInterval(poll);window.clearInterval(galleryPoll);};
+    return()=>{active=false;window.clearInterval(poll);window.clearInterval(galleryPoll);window.clearInterval(archiveTimer);};
   },[]);
 
   const saveName=async e=>{
@@ -195,6 +229,11 @@ export default function Home() {
       }
       setCheerCount(count=>count+1);
     }catch(error){setCheerMessage(error.message||"응원을 저장하지 못했어요.");}
+  };
+
+  const openHostEasterEgg=()=>{
+    hostCatTaps.current+=1;
+    if(hostCatTaps.current>=5){hostCatTaps.current=0;window.location.assign("/host");}
   };
 
   const sharePage=async()=>{
@@ -249,11 +288,7 @@ export default function Home() {
         <div className="stage-halo"/>
         <div className="video-window">{!videoError?<video src="/media/concert-cat.mp4" autoPlay muted loop playsInline preload="metadata" onError={()=>setVideoError(true)} aria-label="기타를 연주하는 고양이 영상"/>:<Cat/>}</div>
       </motion.div>
-      <div className="hero-countdown">
-        <span>COUNTDOWN TO SHOWTIME</span>
-        <Countdown/>
-        <small>2026. 11. 21 · SAT · 18:00</small>
-      </div>
+      <div className="hero-countdown"><Countdown/></div>
       <div className="hero-bottom hero-bottom-simple"><a href="#about">SCROLL TO EXPLORE <ArrowDown size={15}/></a></div>
     </section>
 
@@ -292,44 +327,45 @@ export default function Home() {
       <div className="member-grid">{groups.map(([role,label,emoji,names],i)=><Reveal className={"member-card member-"+i} key={role} delay={i*.06}><strong>{emoji}</strong><h3>{label}</h3><div>{names.map(n=><span key={n}>{n}</span>)}</div>{role==="해외 영업"&&<p className="member-note">미국 출장으로 못 오게 되었지만 마음만은 함께!</p>}<i/></Reveal>)}</div>
     </section>
 
-    <section className="section cheers" id="cheer">
+    {!archiveMode&&<section className="section cheers" id="cheer">
       <div className="kicker inverse"><span>05 / CHEER</span><span>SEND SOME LOVE</span></div>
       <div className="cheer-grid"><Reveal><p className="eyebrow">대일밴드에게 보내는 응원</p><h2>응원으로<br/><em>함께해요.</em></h2><p className="body-copy">응원 버튼을 누르면 다른 관객에게도<br/>닉네임과 함께 응원 애니메이션이 보여요.</p></Reveal>
       <Reveal className="cheer-box" delay={.12}><div className="cheer-count"><b>{cheerCount.toLocaleString("ko-KR")}</b><small>누적 응원</small></div><div className="reaction-grid">{reactions.map(([emoji,label])=><button type="button" aria-label={label} key={emoji} onClick={()=>cheer(emoji)}><b>{emoji}</b></button>)}</div><p className="cheer-message" role="status">{cheerMessage}</p><div className="cheer-wall"><div><span>최근 도착한 응원</span><b><i/> 실시간</b></div><section>{cheers.slice(0,10).map((item,i)=><span key={item.id||i}>{item.emoji} <small>{item.nickname||"익명의 관객"}</small></span>)}{!cheers.length&&<small>첫 응원을 남겨주세요.</small>}</section></div></Reveal></div>
-    </section>
-
-    <section className="section questions" id="questions">
+    </section>}    {!archiveMode&&<section className="section questions" id="questions">
       <div className="kicker"><span>06 / QUESTIONS</span><span>ASK US ANYTHING</span></div>
       <div className="question-grid"><div><p className="eyebrow orange">QUESTIONS & REQUESTS</p><h2>아무거나<br/><em>물어보세요.</em></h2><p className="body-copy">궁금한 점이나 듣고 싶은 이야기를 편하게 남겨주세요.<br/>공연 중간중간 확인하고 답변할게요.</p></div>
       <Reveal className="question-card" delay={.1}><div className="form-top"><span>MESSAGE BOARD</span><span>DAEIL BAND</span></div><form onSubmit={ask}><textarea id="question" value={question} onChange={e=>setQuestion(e.target.value)} maxLength={500} placeholder="드럼 솔로 보여주세요!" required/><div className="form-actions"><small>{question.length} / 500</small><button disabled={!question.trim()}> <Send size={14}/> 메시지 보내기</button></div></form>{questionInfo&&<p className="feedback">{questionInfo}</p>}</Reveal></div>
-    </section>
-
-    <section className="section after" id="rsvp">
+    </section>}    {!archiveMode&&<section className="section after" id="rsvp">
       
       <div className="after-grid"><div><p className="eyebrow">AFTER PARTY</p><h2>공연이 끝나면<br/><em>뒤풀이에서.</em></h2><p className="body-copy">무대가 끝나도 우리의 밤은 끝나지 않아요.<br/>뒤풀이에 함께할 수 있는지 알려주세요!</p><div className="stats"><div><b>{summary.yes}</b><small>참석</small></div><div><b>{summary.maybe}</b><small>미정</small></div><div><b>{summary.no}</b><small>불참</small></div></div></div>
       <Reveal className="rsvp-card" delay={.1}><h3>뒤풀이에 참석하시나요?</h3><div className="choices">{[["yes","🙌","참석할게요"],["maybe","🤔","아직 모르겠어요"],["no","🥲","아쉽지만 불참"]].map(([v,em,t])=><button type="button" key={v} className={attendance===v?"chosen":""} onClick={()=>setAttendance(v)}><span>{em}</span>{t}{attendance===v&&<Check size={15}/>}</button>)}</div>{attendance==="yes"&&<label className="guest-number">참석 인원<select value={people} onChange={e=>setPeople(e.target.value)}>{[1,2,3,4,5,6].map(n=><option key={n}>{n}</option>)}</select></label>}<label className="message-label" htmlFor="after-message">남기고 싶은 말</label><input id="after-message" value={afterMessage} onChange={e=>setAfterMessage(e.target.value)} maxLength={100} placeholder="예: 늦게 합류할게요!"/><button className="send-rsvp" onClick={rsvp}>참석 여부 보내기 <ArrowUpRight size={16}/></button>{rsvpInfo&&<p className="feedback">{rsvpInfo}</p>}</Reveal></div>
-    </section>
-
-    <section className="section qr-section"><Reveal className="qr-card"><div><p className="eyebrow orange">공연 페이지 공유</p><h2>대일밴드<br/><em>공연에서 만나요.</em></h2><p className="share-invite-copy">친구에게 페이지를 공유하고<br/>공연 당일 함께해 주세요.</p><button type="button" className="share-button" onClick={sharePage}><Share2 size={16}/> 공유하기</button>{shareMessage&&<p className="share-message" role="status">{shareMessage}</p>}</div><div className="qr-code"><QRCodeSVG value={siteUrl} size={150} bgColor="#f6f0e7" fgColor="#191715" level="H"/><small>QR 코드로 접속</small></div></Reveal><Reveal className="last-cat"><Cat/></Reveal></section>
+    </section>}    <section className="section qr-section"><Reveal className="qr-card"><div><p className="eyebrow orange">공연 페이지 공유</p><h2>대일밴드<br/><em>공연에서 만나요.</em></h2><p className="share-invite-copy">친구에게 페이지를 공유하고<br/>공연 당일 함께해 주세요.</p><button type="button" className="share-button" onClick={sharePage}><Share2 size={16}/> 공유하기</button>{shareMessage&&<p className="share-message" role="status">{shareMessage}</p>}</div><div className="qr-code"><QRCodeSVG value={siteUrl} size={150} bgColor="#f6f0e7" fgColor="#191715" level="H"/><small>QR 코드로 접속</small></div></Reveal><Reveal className="last-cat"><button type="button" className="host-secret-cat" aria-label="고양이 캐릭터" onClick={openHostEasterEgg}><Cat/></button></Reveal></section>
 
     {galleryEnabled&&<section className="activity-gallery-section" aria-label="대일밴드 활동 사진 모음">
       <Reveal className="activity-gallery" delay={.08}>
         <div className="activity-gallery-heading"><span>DAEIL BAND ARCHIVE</span><b>함께한 순간들</b></div>
         <div className="activity-marquee" onContextMenu={event=>event.preventDefault()} aria-label="대일밴드 활동 사진">
           <div className="activity-marquee-track">
-            {activityPhotos.map((src,index)=><img key={"photo-"+index} src={src} alt={`대일밴드 활동 사진 ${index+1}`} loading="lazy" decoding="async" draggable={false} onDragStart={event=>event.preventDefault()}/>)}
-            {activityPhotos.map((src,index)=><img key={"photo-copy-"+index} src={src} alt="" aria-hidden="true" loading="lazy" decoding="async" draggable={false} onDragStart={event=>event.preventDefault()}/>)}
+            {[0,1].map(copy=><div className="activity-marquee-group" key={copy} aria-hidden={copy===1}>
+              {activityPhotos.map((src,index)=><img key={`photo-${copy}-${index}`} src={src} alt={copy===0?`대일밴드 활동 사진 ${index+1}`:""} loading="lazy" decoding="async" draggable={false} onDragStart={event=>event.preventDefault()}/>)}
+            </div>)}
           </div>
         </div>
       </Reveal>
     </section>}
 
-    <footer><div className="footer-top"><a className="logo cat-logo" href="#top"><img src="/images/cat-headphones.svg" alt="대일밴드 고양이 로고"/></a><p>대일밴드와 함께해 주셔서 감사합니다.</p><a href="#top">맨 위로 ↑</a></div><div className="footer-bottom"><span>© 2026 DAEIL BAND <i>·</i> 배승호 Bae Seung Ho</span><span>2026.11.21 · 18:00 — 21:00</span></div></footer>
-    <div className="sticky-rsvp"><a href="#rsvp">뒤풀이 참석 여부 보내기 ↗</a></div>
+    {archiveMode&&<section className="section memory-archive" id="memories" aria-label="대일밴드 공연 추억 갤러리">
+      <div className="kicker"><span>07 / MEMORIES</span><span>THE NIGHT IN FRAMES</span></div>
+      <div className="memory-archive-head"><p className="eyebrow orange">DAEIL BAND · 2026</p><h2>그날의 우리,<br/><em>다시 만나요.</em></h2><p>함께 노래하고 웃었던 순간들을 이곳에 오래도록 남겨둘게요.</p></div>
+      {memoryPhotos.length>0?<div className="memory-photo-grid">{memoryPhotos.map((src,index)=><figure key={src}><img src={src} alt={`대일밴드 공연 추억 사진 ${index+1}`} loading="lazy"/><figcaption>DAEIL BAND · MEMORY {String(index+1).padStart(2,"0")}</figcaption></figure>)}</div>:<div className="memory-empty"><Cat className="memory-empty-cat"/><div><b>PHOTO ARCHIVE IS COMING</b><p>공연 사진을 준비하고 있어요.<br/>사진이 추가되면 이곳에서 다시 만날 수 있습니다.</p></div></div>}
+    </section>}
 
-    <AnimatePresence>{welcome&&<motion.div className="welcome-bg" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}><motion.div className="welcome" initial={{opacity:0,y:25,scale:.96}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:15}}><button className="close" onClick={()=>setWelcome(false)}><X/></button><div className="welcome-cat">🐈🎸</div><p className="eyebrow orange">DAEIL BAND</p><h2>반가워요!<br/><em>어떻게 불러드릴까요?</em></h2><p>닉네임을 정해 주세요. 비워두면 랜덤 닉네임으로 입장해요.</p><form onSubmit={saveName}><input autoFocus maxLength={14} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="닉네임 (최대 14자)"/><button>입장하기 ↗</button></form><small>닉네임은 이 기기에 저장돼요.</small></motion.div></motion.div>}</AnimatePresence>
-    {nickname&&<button className="nickname" onClick={()=>{setDraft(nickname);setWelcome(true);}}>👋 {nickname}</button>}
-    {checked&&!ready&&<div className="preview"><i/> 연결 확인 필요 <span>{setupMessage||"Supabase 연결과 테이블 설정을 확인해 주세요."}</span></div>}
+    <footer><div className="footer-top"><a className="logo cat-logo" href="#top"><img src="/images/cat-headphones.svg" alt="대일밴드 고양이 로고"/></a><p>대일밴드와 함께해 주셔서 감사합니다.</p><a href="#top">맨 위로 ↑</a></div><div className="footer-bottom"><span>© 2026 DAEIL BAND <i>·</i> 배승호 Bae Seung Ho</span><span>2026.11.21 · 18:00 — 21:00</span></div></footer>
+    {!archiveMode&&<div className="sticky-rsvp"><a href="#rsvp">뒤풀이 참석 여부 보내기 ↗</a></div>}
+
+    <AnimatePresence>{!archiveMode&&welcome&&<motion.div className="welcome-bg" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}><motion.div className="welcome" initial={{opacity:0,y:25,scale:.96}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:15}}><button className="close" onClick={()=>setWelcome(false)}><X/></button><div className="welcome-cat">🐈🎸</div><p className="eyebrow orange">DAEIL BAND</p><h2>반가워요!<br/><em>어떻게 불러드릴까요?</em></h2><p>닉네임을 정해 주세요. 비워두면 랜덤 닉네임으로 입장해요.</p><form onSubmit={saveName}><input autoFocus maxLength={14} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="닉네임 (최대 14자)"/><button>입장하기 ↗</button></form><small>닉네임은 이 기기에 저장돼요.</small></motion.div></motion.div>}</AnimatePresence>
+    {!archiveMode&&nickname&&<button className="nickname" onClick={()=>{setDraft(nickname);setWelcome(true);}}>👋 {nickname}</button>}
+    {!archiveMode&&checked&&!ready&&<div className="preview"><i/> 연결 확인 필요 <span>{setupMessage||"Supabase 연결과 테이블 설정을 확인해 주세요."}</span></div>}
   </main>
   {overlayMounted&&createPortal(<div className="global-cheer-overlay" aria-live="polite"><AnimatePresence>{floating.map(f=><motion.div className="float-cheer" key={f.id} style={{left:f.x+"%"}} initial={{opacity:0,y:25,scale:.55}} animate={{opacity:[0,1,1,1,0],y:[30,-180,-420,-650],scale:[.55,1.12,1.06,1],rotate:8}} exit={{opacity:0}} transition={{duration:4.4,ease:"easeOut"}}><b>{f.emoji}</b><small>{f.nickname}</small></motion.div>)}</AnimatePresence></div>,document.body)}
   </>;
