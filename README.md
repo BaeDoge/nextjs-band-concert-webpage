@@ -174,8 +174,16 @@ const memoryPhotos = [
 ];
 ```
 
-The `MEMORIES` section appears automatically in post-show mode and builds a responsive photo grid from this static list. No Supabase storage or active database is required.
+The `MEMORIES` section appears automatically in post-show mode and builds a responsive photo grid from this static list. Each object can include a caption. No Supabase storage or active database is required. Keep the original photo files in this directory and export resized WebP copies (around 1200px maximum edge, quality 78–85) for the site.
 
 ### Admin page easter egg
 
 The host dashboard is reachable by clicking the mascot cat below the sharing QR panel five times. The `/host` route remains available directly as well.
+
+
+### Image fallback and archive timing
+
+- The post-show switch is checked every second. The D+ counter is based on Korea Standard Time and the concert date (November 21, 2026).
+- After 21:00 KST, client-side visitor registration and all Supabase-backed actions are skipped. The post-show site remains a static Next.js/Vercel page with no database dependency.
+- Activity carousel images that fail to decode are hidden rather than leaving a broken-image icon or an empty flex slot. The spacing between valid thumbnails is tightened.
+- The host Easter egg accepts five taps on the mascot cat within a six-second window.
