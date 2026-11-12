@@ -540,3 +540,11 @@ button,input,textarea,select{font-family:inherit}
 @media(prefers-reduced-motion:reduce){
  .activity-marquee-track{animation:none;transform:translateX(0)}
 }
+
+
+/* Seamless, tighter activity strip; hide any unavailable thumbnail without leaving a broken icon */
+.activity-marquee-group{gap:7px;padding-right:7px}
+.activity-marquee-group img{display:block;object-fit:cover;object-position:center;image-rendering:auto}
+.activity-marquee-track img[style*="display: none"]{display:none!important}
+.memory-photo-grid figure{overflow:hidden}
+.memory-photo-grid img{display:block;width:100%;height:100%;object-fit:cover}
