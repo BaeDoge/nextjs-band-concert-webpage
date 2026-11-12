@@ -140,3 +140,18 @@ The gallery is a single compressed SVG strip (about 14 KB compressed, about 23 K
 - The gallery strip is regenerated from the uploaded original photos as a higher-resolution WebP asset at `public/images/activity-gallery.webp`. To add more activity photos, upload the new images and regenerate this single horizontal strip with the originals, then replace the asset and keep the two-track marquee in `app/page.js`.
 - The strip is rendered as a non-clickable WebP and cached for one year. The marquee takes about 42 seconds per desktop loop and 34 seconds on mobile.
 - Admin visitor deletion uses the SQL function in `supabase/migrations/20261112_visitor_delete.sql`. Run this once in the Supabase SQL Editor before using the Delete button. It atomically deletes the matching visitor record and all linked cheers, messages and RSVP data. The admin page displays a confirmation with associated record counts before requesting deletion.
+
+
+## Activity gallery: individual high-resolution photos
+
+The public carousel currently uses six individual WebP thumbnails under `public/images/activity/` (420px maximum edge). To add more photos:
+1. Export the new photo as WebP (recommended 380–600px maximum edge for this small gallery).
+2. Add it as `public/images/activity/activity-07.webp` (use the next number).
+3. Add the matching URL to the `activityPhotos` array near the top of `app/page.js`.
+4. Add a matching static cache header in `vercel.json` for that WebP path.
+
+The duplicated image sequence makes the marquee loop seamlessly. Desktop speed is 30 seconds per loop; mobile speed is 24 seconds. The source images are public assets; disabling right-click/drag only discourages casual saving, and does not make browser-delivered images impossible to download.
+
+## Admin visitor deletion
+
+Before using the visitor Delete button for the first time, execute `supabase/migrations/20261112_visitor_delete.sql` once in Supabase SQL Editor. This creates a server-only RPC that atomically removes the selected visitor and their linked cheers, questions and RSVP. The admin confirmation displays the associated record counts. This cannot be undone.
