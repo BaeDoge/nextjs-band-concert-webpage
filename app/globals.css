@@ -466,3 +466,15 @@ button,input,textarea,select{font-family:inherit}
  .host-user-actions{flex-direction:column;align-items:stretch;gap:6px}
  .host-user-actions button{justify-content:center;padding:8px 9px;font-size:9px}
 }
+
+
+/* Faster, sharper activity photo carousel */
+.activity-marquee-track{animation-duration:30s}
+.activity-marquee-track img{height:clamp(158px,17vw,190px);width:auto;max-width:none;object-fit:contain;border-radius:5px;margin-right:18px}
+@media(max-width:800px){
+ .activity-marquee-track{animation-duration:24s}
+ .activity-marquee-track img{height:142px;margin-right:14px}
+}
+@media(max-width:420px){
+ .activity-marquee-track img{height:132px}
+}
