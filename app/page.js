@@ -47,7 +47,10 @@ function Reveal({children,className="",delay=0}) {
 const SHOW_START_AT = new Date("2026-11-21T18:00:00+09:00").getTime();
 const SHOW_END_AT = new Date("2026-11-21T21:00:00+09:00").getTime();
 const SHOW_DAY_START = new Date("2026-11-21T00:00:00+09:00").getTime();
-const memoryPhotos = []; // Add public image paths here after uploading photos to public/images/memories/.
+const memoryPhotos = [
+  // 공연 후 사진을 public/images/memories/에 추가하고 아래처럼 경로와 설명을 적어주세요.
+  // { src: "/images/memories/2026-11-21-001.webp", caption: "대일밴드 첫 무대" },
+];
 
 function Countdown() {
   const [now,setNow]=useState(null);
@@ -233,7 +236,7 @@ export default function Home() {
 
   const openHostEasterEgg=()=>{
     const now=Date.now();
-    if(now-hostCatTaps.current.last>3500)hostCatTaps.current.count=0;
+    if(now-hostCatTaps.current.last>5000)hostCatTaps.current.count=0;
     hostCatTaps.current.last=now;
     hostCatTaps.current.count+=1;
     if(hostCatTaps.current.count>=5){hostCatTaps.current={count:0,last:0};window.location.assign("/host");}
@@ -366,7 +369,11 @@ export default function Home() {
     {archiveMode&&<section className="section memory-archive" id="memories" aria-label="대일밴드 공연 추억 갤러리">
       <div className="kicker"><span>07 / MEMORIES</span><span>THE NIGHT IN FRAMES</span></div>
       <div className="memory-archive-head"><p className="eyebrow orange">DAEIL BAND · 2026</p><h2>그날의 우리,<br/><em>다시 만나요.</em></h2><p>함께 노래하고 웃었던 순간들을 이곳에 오래도록 남겨둘게요.</p></div>
-      {memoryPhotos.length>0?<div className="memory-photo-grid">{memoryPhotos.map((src,index)=><figure key={src}><img src={src} alt={`대일밴드 공연 추억 사진 ${index+1}`} loading="lazy"/><figcaption>DAEIL BAND · MEMORY {String(index+1).padStart(2,"0")}</figcaption></figure>)}</div>:<div className="memory-empty"><Cat className="memory-empty-cat"/><div><b>PHOTO ARCHIVE IS COMING</b><p>공연 사진을 준비하고 있어요.<br/>사진이 추가되면 이곳에서 다시 만날 수 있습니다.</p></div></div>}
+      {memoryPhotos.length>0?<div className="memory-photo-grid">{memoryPhotos.map((photo,index)=>{
+        const src=typeof photo==="string"?photo:photo.src;
+        const caption=typeof photo==="string"?"":photo.caption;
+        return <figure key={src}><img src={src} alt={`대일밴드 공연 추억 사진 ${index+1}`} loading="lazy" decoding="async"/><figcaption>{caption||`DAEIL BAND · MEMORY ${String(index+1).padStart(2,"0")}`}</figcaption></figure>;
+      })}</div>:<div className="memory-empty"><Cat className="memory-empty-cat"/><div><b>PHOTO ARCHIVE IS COMING</b><p>공연 사진을 준비하고 있어요.<br/>사진이 추가되면 이곳에서 다시 만날 수 있습니다.</p></div></div>}
     </section>}
 
     <footer><div className="footer-top"><a className="logo cat-logo" href="#top"><img src="/images/cat-headphones.svg" alt="대일밴드 고양이 로고"/></a><p>대일밴드와 함께해 주셔서 감사합니다.</p><a href="#top">맨 위로 ↑</a></div><div className="footer-bottom"><span>© 2026 DAEIL BAND <i>·</i> 배승호 Bae Seung Ho</span><span>2026.11.21 · 18:00 — 21:00</span></div></footer>
