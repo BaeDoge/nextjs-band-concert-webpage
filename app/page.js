@@ -47,7 +47,7 @@ function Reveal({children,className="",delay=0}) {
 const SHOW_START_AT = new Date("2026-11-21T18:00:00+09:00").getTime();
 const SHOW_END_AT = new Date("2026-11-21T21:00:00+09:00").getTime();
 const SHOW_DAY_START = new Date("2026-11-21T00:00:00+09:00").getTime();
-const memoryPhotos = []; // Add post-concert photos under /images/memories and list their paths here.
+const memoryPhotos = []; // Add public image paths here after uploading photos to public/images/memories/.
 
 function Countdown() {
   const [now,setNow]=useState(null);
@@ -108,7 +108,7 @@ export default function Home() {
   const [overlayMounted,setOverlayMounted]=useState(false);
   const [galleryEnabled,setGalleryEnabled]=useState(true);
   const [archiveMode,setArchiveMode]=useState(false);
-  const hostCatTaps=useRef(0);
+  const hostCatTaps=useRef({count:0,last:0});
   const siteUrl="https://daeil-band.vercel.app";
   const {scrollYProgress}=useScroll();
   const progress=useSpring(scrollYProgress,{stiffness:100,damping:30,restDelta:.001});
@@ -232,8 +232,11 @@ export default function Home() {
   };
 
   const openHostEasterEgg=()=>{
-    hostCatTaps.current+=1;
-    if(hostCatTaps.current>=5){hostCatTaps.current=0;window.location.assign("/host");}
+    const now=Date.now();
+    if(now-hostCatTaps.current.last>3500)hostCatTaps.current.count=0;
+    hostCatTaps.current.last=now;
+    hostCatTaps.current.count+=1;
+    if(hostCatTaps.current.count>=5){hostCatTaps.current={count:0,last:0};window.location.assign("/host");}
   };
 
   const sharePage=async()=>{
@@ -347,7 +350,7 @@ export default function Home() {
 
     <section className="section qr-section"><Reveal className="qr-card"><div><p className="eyebrow orange">공연 페이지 공유</p><h2>대일밴드<br/><em>공연에서 만나요.</em></h2><p className="share-invite-copy">친구에게 페이지를 공유하고<br/>공연 당일 함께해 주세요.</p><button type="button" className="share-button" onClick={sharePage}><Share2 size={16}/> 공유하기</button>{shareMessage&&<p className="share-message" role="status">{shareMessage}</p>}</div><div className="qr-code"><QRCodeSVG value={siteUrl} size={150} bgColor="#f6f0e7" fgColor="#191715" level="H"/><small>QR 코드로 접속</small></div></Reveal><Reveal className="last-cat"><button type="button" className="host-secret-cat" aria-label="고양이 캐릭터" onClick={openHostEasterEgg}><Cat/></button></Reveal></section>
 
-    {galleryEnabled&&<section className="activity-gallery-section" aria-label="대일밴드 활동 사진 모음">
+    {(archiveMode||galleryEnabled)&&<section className="activity-gallery-section" aria-label="대일밴드 활동 사진 모음">
       <Reveal className="activity-gallery" delay={.08}>
         <div className="activity-gallery-heading"><span>DAEIL BAND ARCHIVE</span><b>함께한 순간들</b></div>
         <div className="activity-marquee" onContextMenu={event=>event.preventDefault()} aria-label="대일밴드 활동 사진">
