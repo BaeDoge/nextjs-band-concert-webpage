@@ -117,6 +117,7 @@ export default function Home() {
   const progress=useSpring(scrollYProgress,{stiffness:100,damping:30,restDelta:.001});
 
   const registerVisitor=async(id,name)=>{
+    if(Date.now()>=SHOW_END_AT)return false;
     try{
       const response=await fetch("/api/visitors",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({visitorId:id,nickname:name})});
       const data=await response.json();
@@ -132,7 +133,7 @@ export default function Home() {
     setOverlayMounted(true);
     const syncArchiveMode=()=>setArchiveMode(Date.now()>=SHOW_END_AT);
     syncArchiveMode();
-    const archiveTimer=window.setInterval(syncArchiveMode,30000);
+    const archiveTimer=window.setInterval(syncArchiveMode,1000);
     if(Date.now()>=SHOW_END_AT)return()=>window.clearInterval(archiveTimer);
     let active=true;
     const saved=localStorage.getItem("band-night-name");
@@ -207,6 +208,7 @@ export default function Home() {
 
   const saveName=async e=>{
     e.preventDefault();
+    if(Date.now()>=SHOW_END_AT){setWelcome(false);return;}
     const name=draft.trim().slice(0,14)||randomName();
     localStorage.setItem("band-night-name",name);
     setNickname(name);
@@ -215,6 +217,7 @@ export default function Home() {
   };
 
   const cheer=async emoji=>{
+    if(Date.now()>=SHOW_END_AT)return;
     playCheerSound();
     if(!ready){setCheerMessage(setupMessage||"응원 저장 서버가 연결되지 않았어요.");return;}
     if(!visitorId){setCheerMessage("방문자 정보를 준비하고 있어요. 잠시 후 다시 눌러 주세요.");return;}
@@ -236,7 +239,7 @@ export default function Home() {
 
   const openHostEasterEgg=()=>{
     const now=Date.now();
-    if(now-hostCatTaps.current.last>5000)hostCatTaps.current.count=0;
+    if(now-hostCatTaps.current.last>6000)hostCatTaps.current.count=0;
     hostCatTaps.current.last=now;
     hostCatTaps.current.count+=1;
     if(hostCatTaps.current.count>=5){hostCatTaps.current={count:0,last:0};window.location.assign("/host");}
@@ -253,6 +256,7 @@ export default function Home() {
 
   const ask=async e=>{
     e.preventDefault();
+    if(Date.now()>=SHOW_END_AT)return;
     if(!question.trim())return;
     if(!ready){setQuestionInfo(setupMessage||"메시지 전송 서버에 연결할 수 없어요.");return;}
     if(!visitorId){setQuestionInfo("방문자 정보를 준비하고 있어요. 잠시 후 다시 시도해 주세요.");return;}
@@ -267,6 +271,7 @@ export default function Home() {
 
   const rsvp=async e=>{
     e.preventDefault();
+    if(Date.now()>=SHOW_END_AT)return;
     if(!ready){setRsvpInfo(setupMessage||"응답 서버에 연결할 수 없어요.");return;}
     if(!visitorId){setRsvpInfo("방문자 정보를 준비하고 있어요. 잠시 후 다시 시도해 주세요.");return;}
     setRsvpInfo("저장 중...");
@@ -359,7 +364,7 @@ export default function Home() {
         <div className="activity-marquee" onContextMenu={event=>event.preventDefault()} aria-label="대일밴드 활동 사진">
           <div className="activity-marquee-track">
             {[0,1].map(copy=><div className="activity-marquee-group" key={copy} aria-hidden={copy===1}>
-              {activityPhotos.map((src,index)=><img key={`photo-${copy}-${index}`} src={src} alt={copy===0?`대일밴드 활동 사진 ${index+1}`:""} loading="lazy" decoding="async" draggable={false} onDragStart={event=>event.preventDefault()}/>)}
+              {activityPhotos.map((src,index)=><img key={`photo-${copy}-${index}`} src={src} alt={copy===0?`대일밴드 활동 사진 ${index+1}`:""} loading="lazy" decoding="async" draggable={false} onError={event=>{event.currentTarget.style.display="none";}} onDragStart={event=>event.preventDefault()}/>)}
             </div>)}
           </div>
         </div>
