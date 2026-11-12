@@ -19,6 +19,7 @@ const groups = [
   ["해외 영업","해외 영업","✈️",["다은"]]
 ];
 const reactions = [["🔥","불타오르자"],["👏","박수"],["💛","하트"],["🎸","기타"],["🐈","고양이"],["✨","반짝"]];
+const activityPhotos = [1,2,3,4,5,6].map(n=>`/images/activity/activity-${String(n).padStart(2,"0")}.webp`);
 const randomName = () => ["리듬타는","야광","신나는","새벽","앵콜","기타치는"][Math.floor(Math.random()*6)]+" 관객 "+Math.floor(100+Math.random()*900);
 
 function playCheerSound() {
@@ -316,8 +317,8 @@ export default function Home() {
         <div className="activity-gallery-heading"><span>DAEIL BAND ARCHIVE</span><b>함께한 순간들</b></div>
         <div className="activity-marquee" onContextMenu={event=>event.preventDefault()} aria-label="대일밴드 활동 사진">
           <div className="activity-marquee-track">
-            <img src="/images/activity-gallery.webp" alt="대일밴드 활동 사진 모음" draggable={false} onDragStart={event=>event.preventDefault()}/>
-            <img src="/images/activity-gallery.webp" alt="" aria-hidden="true" draggable={false} onDragStart={event=>event.preventDefault()}/>
+            {activityPhotos.map((src,index)=><img key={"photo-"+index} src={src} alt={`대일밴드 활동 사진 ${index+1}`} loading="lazy" decoding="async" draggable={false} onDragStart={event=>event.preventDefault()}/>)}
+            {activityPhotos.map((src,index)=><img key={"photo-copy-"+index} src={src} alt="" aria-hidden="true" loading="lazy" decoding="async" draggable={false} onDragStart={event=>event.preventDefault()}/>)}
           </div>
         </div>
       </Reveal>
