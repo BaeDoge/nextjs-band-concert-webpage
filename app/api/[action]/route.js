@@ -263,5 +263,10 @@ export async function DELETE(req,ctx){
   if(error)return jsonError("응원 기록 초기화에 실패했어요.");
   return NextResponse.json({ok:true,total:0});
  }
+ if(action==="inactive-visitors"){
+  const{data,error}=await client.rpc("daeil_admin_delete_inactive_visitors");
+  if(error)return jsonError("활동 이력이 없는 사용자를 삭제하지 못했어요. supabase/migrations/20261113_inactive_visitors_cleanup.sql을 실행했는지 확인해 주세요.");
+  return NextResponse.json({ok:true,deleted:data||{}});
+ }
  return jsonError("Not found",404);
 }
