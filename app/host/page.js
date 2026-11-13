@@ -12,6 +12,7 @@ export default function HostPage(){
  const[rsvps,setRsvps]=useState([]);
  const[galleryEnabled,setGalleryEnabled]=useState(true);
  const[visitors,setVisitors]=useState([]);
+ const[inactiveVisitorCount,setInactiveVisitorCount]=useState(0);
  const[messages,setMessages]=useState([]);
  const[answers,setAnswers]=useState({});
  const[search,setSearch]=useState("");
@@ -26,7 +27,7 @@ export default function HostPage(){
    const response=await fetch("/api/admin",{headers:{"x-admin-key":key},cache:"no-store"});
    const data=await response.json();
    if(!response.ok)throw Error(data.error||"관리자 정보를 불러오지 못했어요.");
-   setStats(data.stats||{});setVisitors(data.visitors||[]);setMessages(data.messages||[]);setRsvps(data.rsvps||[]);setGalleryEnabled(data.settings?.gallery_enabled??true);setOk(true);
+   setStats(data.stats||{});setVisitors(data.visitors||[]);setInactiveVisitorCount(Number(data.inactiveVisitorCount||0));setMessages(data.messages||[]);setRsvps(data.rsvps||[]);setGalleryEnabled(data.settings?.gallery_enabled??true);setOk(true);
   }catch(e){setOk(false);setError(e.message||"관리자 인증에 실패했어요.");}
   finally{setBusy(false);}
  }
@@ -63,6 +64,22 @@ export default function HostPage(){
    const data=await response.json();if(!response.ok)throw Error(data.error||"차단 상태를 변경하지 못했어요.");
    setNotice(next?"해당 브라우저 ID를 차단했어요.":"차단을 해제했어요.");await load();
   }catch(e){setError(e.message);}
+  finally{setBusy(false);}
+ }
+
+ async function deleteInactiveVisitors(){
+  const count=inactiveVisitorCount;
+  if(!count)return;
+  const confirmation="활동 이력이 없는 사용자 "+count+"명을 일괄 삭제할까요?\\n\\n응원, 메시지, 뒤풀이 응답이 모두 없는 사용자만 삭제합니다. 차단된 사용자는 보존됩니다.\\n\\n삭제 후 복구할 수 없습니다.";
+  if(!window.confirm(confirmation))return;
+  setBusy(true);setError("");setNotice("");
+  try{
+   const response=await fetch("/api/inactive-visitors",{method:"DELETE",headers:{"x-admin-key":key}});
+   const data=await response.json();
+   if(!response.ok)throw Error(data.error||"미활동 사용자를 삭제하지 못했어요.");
+   setNotice("활동 이력이 없는 사용자 "+Number(data.deletedCount||0)+"명을 삭제했어요.");
+   await load();
+  }catch(e){setError(e.message||"일괄 삭제에 실패했어요.");}
   finally{setBusy(false);}
  }
 
@@ -130,6 +147,10 @@ export default function HostPage(){
 
     <section className="host-panel">
      <div className="host-panel-head"><div><small>GUEST MANAGEMENT</small><h2>참여자 목록</h2><p>등록된 브라우저별 닉네임과 응원 활동입니다.</p></div><span className="host-count">{visitors.length}명 표시</span></div>
+     <div className="host-bulk-cleanup">
+      <div><strong>활동 이력 없는 사용자</strong><small>응원·메시지·뒤풀이 응답이 모두 없는 사용자 · 차단된 사용자는 제외</small></div>
+      <div className="host-bulk-cleanup-action"><b>{inactiveVisitorCount.toLocaleString("ko-KR")}명</b><button className="host-delete" onClick={deleteInactiveVisitors} disabled={busy||inactiveVisitorCount===0}><Trash2 size={14}/> 일괄 삭제</button></div>
+     </div>
      <div className="host-search"><Search size={16}/><input value={search} onChange={event=>setSearch(event.target.value)} placeholder="닉네임 또는 사용자 ID 검색"/></div>
      <div className="host-users">
       {filteredVisitors.length===0?<p className="host-empty">검색 결과가 없습니다.</p>:filteredVisitors.map(visitor=>
