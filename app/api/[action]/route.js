@@ -116,7 +116,7 @@ export async function GET(req,ctx){
    client.rpc("daeil_admin_inactive_visitor_count")
   ]);
   if(statsResult.error||visitorsResult.error||questionsResult.error||rsvpsResult.error||settingsResult.error||inactiveCountResult.error){
-   return NextResponse.json({error:"관리자 정보를 불러오지 못했어요. supabase/migrations/20261112_admin_moderation.sql과 20261112_gallery_settings.sql을 실행했는지 확인해 주세요."},{status:500});
+   return NextResponse.json({error:"관리자 정보를 불러오지 못했어요. supabase/migrations/20261112_admin_moderation.sql, 20261112_gallery_settings.sql, 20261113_cleanup_inactive_visitors.sql을 실행했는지 확인해 주세요."},{status:500});
   }
   const byVisitor=statsResult.data?.cheers_by_visitor||{};
   const visitors=(visitorsResult.data||[]).map(v=>({...v,cheer_count:Number(byVisitor[v.visitor_id]||0)}));
@@ -270,11 +270,6 @@ export async function DELETE(req,ctx){
   const{error}=await client.from("cheers").delete().gte("created_at","1970-01-01T00:00:00.000Z");
   if(error)return jsonError("응원 기록 초기화에 실패했어요.");
   return NextResponse.json({ok:true,total:0});
- }
- if(action==="inactive-visitors"){
-  const{data,error}=await client.rpc("daeil_admin_delete_inactive_visitors");
-  if(error)return jsonError("활동 이력이 없는 사용자를 삭제하지 못했어요. supabase/migrations/20261113_inactive_visitors_cleanup.sql을 실행했는지 확인해 주세요.");
-  return NextResponse.json({ok:true,deleted:data||{}});
  }
  return jsonError("Not found",404);
 }
