@@ -107,14 +107,15 @@ export async function GET(req,ctx){
 
  if(action==="admin"){
   if(!admin(req))return jsonError("운영자 인증이 필요해요.",401);
-  const[statsResult,visitorsResult,questionsResult,rsvpsResult,settingsResult]=await Promise.all([
+  const[statsResult,visitorsResult,questionsResult,rsvpsResult,settingsResult,inactiveCountResult]=await Promise.all([
    client.rpc("daeil_admin_stats"),
    client.from("visitors").select("visitor_id,nickname,blocked,block_reason,created_at,last_seen").order("last_seen",{ascending:false}).limit(500),
    client.from("questions").select("id,nickname,visitor_id,body,answer,status,created_at,answered_at").order("created_at",{ascending:false}).limit(500),
    client.from("rsvps").select("visitor_id,nickname,attendance,headcount,message,updated_at").order("updated_at",{ascending:false}).limit(500),
-   client.from("site_settings").select("gallery_enabled").eq("id",1).maybeSingle()
+   client.from("site_settings").select("gallery_enabled").eq("id",1).maybeSingle(),
+   client.rpc("daeil_admin_inactive_visitor_count")
   ]);
-  if(statsResult.error||visitorsResult.error||questionsResult.error||rsvpsResult.error||settingsResult.error){
+  if(statsResult.error||visitorsResult.error||questionsResult.error||rsvpsResult.error||settingsResult.error||inactiveCountResult.error){
    return NextResponse.json({error:"관리자 정보를 불러오지 못했어요. supabase/migrations/20261112_admin_moderation.sql과 20261112_gallery_settings.sql을 실행했는지 확인해 주세요."},{status:500});
   }
   const byVisitor=statsResult.data?.cheers_by_visitor||{};
@@ -124,7 +125,8 @@ export async function GET(req,ctx){
    visitors,
    messages:questionsResult.data||[],
    rsvps:rsvpsResult.data||[],
-   settings:{gallery_enabled:settingsResult.data?.gallery_enabled??true}
+   settings:{gallery_enabled:settingsResult.data?.gallery_enabled??true},
+   inactiveVisitorCount:Number(inactiveCountResult.data||0)
   });
  }
  return jsonError("Not found",404);
@@ -247,6 +249,12 @@ export async function DELETE(req,ctx){
  const{action}=await ctx.params;
  if(!admin(req))return jsonError("운영자 인증이 필요해요.",401);
  const client=db();if(!client)return missing();
+
+ if(action==="inactive-visitors"){
+  const{data,error}=await client.rpc("daeil_admin_cleanup_inactive_visitors");
+  if(error)return jsonError("미활동 사용자를 삭제하지 못했어요. supabase/migrations/20261113_cleanup_inactive_visitors.sql을 실행했는지 확인해 주세요.");
+  return NextResponse.json({ok:true,deletedCount:Number(data||0)});
+ }
 
  if(action==="visitors"){
   let body={};
