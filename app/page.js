@@ -352,7 +352,7 @@ export default function Home() {
     {!archiveMode&&<section className="section questions" id="questions">
       <div className="kicker"><span>06 / QUESTIONS</span><span>ASK US ANYTHING</span></div>
       <div className="question-grid"><div><p className="eyebrow orange">QUESTIONS & REQUESTS</p><h2>아무거나<br/><em>물어보세요.</em></h2><p className="body-copy">궁금한 점이나 듣고 싶은 이야기를 편하게 남겨주세요.<br/>공연 전, 중간중간 확인하고 답변할게요.</p></div>
-      <Reveal className="question-card" delay={.1}><div className="form-top"><span>MESSAGE BOARD</span><span>DAEIL BAND</span></div><form onSubmit={ask}><textarea id="question" value={question} onChange={e=>setQuestion(e.target.value)} maxLength={500} placeholder="드럼 솔로 보여주세요!" required/><div className="form-actions"><small>{question.length} / 500</small><button disabled={!question.trim()}> <Send size={14}/> 메시지 보내기</button></div></form>{questionInfo&&<p className="feedback">{questionInfo}</p>}</Reveal></div>
+      <Reveal className="question-card" delay={.1}><div className="form-top"><span>MESSAGE BOARD</span><span>DAEIL BAND</span></div><form onSubmit={ask}><textarea id="question" value={question} onChange={e=>setQuestion(e.target.value)} maxLength={500} placeholder="밴드 이름이 왜 대일밴드에요?" required/><div className="form-actions"><small>{question.length} / 500</small><button disabled={!question.trim()}> <Send size={14}/> 메시지 보내기</button></div></form>{questionInfo&&<p className="feedback">{questionInfo}</p>}</Reveal></div>
     </section>}
 
     {!archiveMode&&<section className="section after" id="rsvp">
