@@ -357,7 +357,7 @@ export default function Home() {
 
     {!archiveMode&&<section className="section after" id="rsvp">
       
-      <div className="after-grid"><div><p className="eyebrow">AFTER PARTY</p><h2>공연 후 뒤풀이<br/><em>준비 되었습니다.</em></h2><p className="body-copy">공연한 저희들도 배가 고파요.<br/>뒤풀이에 함께할 수 있는지 알려주세요!</p><div className="stats"><div><b>{summary.yes}</b><small>참석</small></div><div><b>{summary.maybe}</b><small>미정</small></div><div><b>{summary.no}</b><small>불참</small></div></div></div>
+      <div className="after-grid"><div><p className="eyebrow">AFTER PARTY</p><h2>공연 후 뒤풀이<br/><em>어때요?</em></h2><p className="body-copy">공연한 저희들도 배가 고파요.<br/>뒤풀이에 함께할 수 있는지 알려주세요!</p><div className="stats"><div><b>{summary.yes}</b><small>참석</small></div><div><b>{summary.maybe}</b><small>미정</small></div><div><b>{summary.no}</b><small>불참</small></div></div></div>
       <Reveal className="rsvp-card" delay={.1}><h3>뒤풀이에 참석하시나요?</h3><div className="choices">{[["yes","🙌","참석할게요"],["maybe","🤔","아직 모르겠어요"],["no","😢","아쉽지만 불참"]].map(([v,em,t])=><button type="button" key={v} className={attendance===v?"chosen":""} onClick={()=>setAttendance(v)}><span>{em}</span>{t}{attendance===v&&<Check size={15}/>}</button>)}</div>{attendance==="yes"&&<label className="guest-number">참석 인원<select value={people} onChange={e=>setPeople(e.target.value)}>{[1,2,3,4,5,6].map(n=><option key={n}>{n}</option>)}</select></label>}<label className="message-label" htmlFor="after-message">남기고 싶은 말</label><input id="after-message" value={afterMessage} onChange={e=>setAfterMessage(e.target.value)} maxLength={100} placeholder="예: 늦참 하겠습니다!"/><button className="send-rsvp" onClick={rsvp}>참석 여부 보내기 <ArrowUpRight size={16}/></button>{rsvpInfo&&<p className="feedback">{rsvpInfo}</p>}</Reveal></div>
     </section>}
 
