@@ -311,7 +311,7 @@ export default function Home() {
     <section className="section intro" id="about">
       <div className="kicker"><span>01 / ABOUT</span><span>OUR STORY</span></div>
       <div className="intro-grid">
-        <Reveal><p className="eyebrow orange">대일밴드</p><h2>안녕하세요<br/><em>대일밴드입니다.</em></h2><p className="body-copy">2024년 5명으로 시작해서 현재 31명이 활동하고 있는 <br/>직장인 동호회 취미밴드 입니다. 🐈‍<br/>피넛버터시티와 연합해서 준비한 연말 공연에 초대합니다!<br/> 저희가 준비한 노래를 재미있게 즐겨 주셨으면 좋겠습니다. 😄🎸<br/>공연에서 만나요!</p><p className="signature">대일밴드 승호 드림</p></Reveal>
+        <Reveal><p className="eyebrow orange">대일밴드</p><h2>안녕하세요<br/><em>대일밴드입니다.</em></h2><p className="body-copy">2024년 5명으로 시작해서 현재 31명이 활동하고 있는 <br/>직장인 동호회 취미밴드 입니다.<br/>피넛버터시티와 연합해서 준비한 연말 공연에 초대합니다!<br/> 저희가 준비한 노래를 재미있게 즐겨 주셨으면 좋겠습니다.🎸<br/>공연에서 만나요!</p><p className="signature">대일밴드 승호 드림</p></Reveal>
         <Reveal className="cat-stage" delay={.12}><div className="orbit one"/><div className="orbit two"/><Cat className="intro-cat"/><span className="cat-label">마스코트<br/>대일냥이</span></Reveal>
       </div>
       
@@ -340,7 +340,7 @@ export default function Home() {
     <section className="section members" id="members">
       <div className="kicker"><span>04 / MEMBERS</span><span>MEET THE BAND</span></div>
       <div className="members-head"><h2>MEET THE<br/><em>BAND.</em></h2><p>이번 무대를 함께 만드는 멤버들입니다.</p></div>
-      <div className="member-grid">{groups.map(([role,label,emoji,names],i)=><Reveal className={"member-card member-"+i} key={role} delay={i*.06}><strong>{emoji}</strong><h3>{label}</h3><div>{names.map(n=><span key={n}>{n}</span>)}</div>{role==="해외 영업"&&<p className="member-note">미국 출장으로 못 오게 되었지만 마음만은 함께!</p>}<i/></Reveal>)}</div>
+      <div className="member-grid">{groups.map(([role,label,emoji,names],i)=><Reveal className={"member-card member-"+i} key={role} delay={i*.06}><strong>{emoji}</strong><h3>{label}</h3><div>{names.map(n=><span key={n}>{n}</span>)}</div>{role==="해외 영업"&&<p className="member-note">미국 출장으로 못 오게 되었지만 <br/> 마음만은 함께!</p>}<i/></Reveal>)}</div>
     </section>
 
     {!archiveMode&&<section className="section cheers" id="cheer">
@@ -352,7 +352,7 @@ export default function Home() {
     {!archiveMode&&<section className="section questions" id="questions">
       <div className="kicker"><span>06 / QUESTIONS</span><span>ASK US ANYTHING</span></div>
       <div className="question-grid"><div><p className="eyebrow orange">QUESTIONS & REQUESTS</p><h2>아무거나<br/><em>물어보세요.</em></h2><p className="body-copy">궁금한 점이나 듣고 싶은 이야기를 편하게 남겨주세요.<br/>공연 전, 중간중간 확인하고 답변할게요.</p></div>
-      <Reveal className="question-card" delay={.1}><div className="form-top"><span>MESSAGE BOARD</span><span>DAEIL BAND</span></div><form onSubmit={ask}><textarea id="question" value={question} onChange={e=>setQuestion(e.target.value)} maxLength={500} placeholder="밴드 이름이 왜 대일밴드에요?" required/><div className="form-actions"><small>{question.length} / 500</small><button disabled={!question.trim()}> <Send size={14}/> 메시지 보내기</button></div></form>{questionInfo&&<p className="feedback">{questionInfo}</p>}</Reveal></div>
+      <Reveal className="question-card" delay={.1}><div className="form-top"><span>MESSAGE BOARD</span><span>DAEIL BAND</span></div><form onSubmit={ask}><textarea id="question" value={question} onChange={e=>setQuestion(e.target.value)} maxLength={500} placeholder="기타 무료나눔 가능한가요?" required/><div className="form-actions"><small>{question.length} / 500</small><button disabled={!question.trim()}> <Send size={14}/> 메시지 보내기</button></div></form>{questionInfo&&<p className="feedback">{questionInfo}</p>}</Reveal></div>
     </section>}
 
     {!archiveMode&&<section className="section after" id="rsvp">
