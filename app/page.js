@@ -378,7 +378,7 @@ export default function Home() {
 
     {archiveMode&&<section className="section memory-archive" id="memories" aria-label="대일밴드 공연 추억 갤러리">
       <div className="kicker"><span>07 / MEMORIES</span><span>THE NIGHT IN FRAMES</span></div>
-      <div className="memory-archive-head"><p className="eyebrow orange">DAEIL BAND · 2026</p><h2>그날의 우리,<br/><em>다시 만나요.</em></h2><p>함께 노래하고 웃었던 순간들을 이곳에 오래도록 남겨둘게요.</p></div>
+      <div className="memory-archive-head"><p className="eyebrow orange">DAEIL BAND · 2026</p><h2>즐거웠던 공연,<br/><em>다시 만나요 !</em></h2><p>댈밴드의 추억 저장소</p></div>
       {memoryPhotos.length>0?<div className="memory-photo-grid">{memoryPhotos.map((photo,index)=>{
         const src=typeof photo==="string"?photo:photo.src;
         const caption=typeof photo==="string"?"":photo.caption;
@@ -389,7 +389,7 @@ export default function Home() {
     <footer><div className="footer-top"><a className="logo cat-logo" href="#top"><img src="/images/cat-headphones.svg" alt="대일밴드 고양이 로고"/></a><p>대일밴드와 함께해 주셔서 감사합니다.</p><a href="#top">맨 위로 ↑</a></div><div className="footer-bottom"><span>© 2026 DAEIL BAND <i>·</i> 배승호 Bae Seung Ho</span><span>2026.11.21 · 18:00 — 21:00</span></div></footer>
     {!archiveMode&&<div className="sticky-rsvp"><a href="#rsvp">뒤풀이 참석 여부 보내기 ↗</a></div>}
 
-    <AnimatePresence>{!archiveMode&&welcome&&<motion.div className="welcome-bg" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}><motion.div className="welcome" initial={{opacity:0,y:25,scale:.96}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:15}}><button className="close" onClick={()=>setWelcome(false)}><X/></button><div className="welcome-cat">🐈🎸</div><p className="eyebrow orange">DAEIL BAND</p><h2>반가워요!<br/><em>어떻게 불러드릴까요?</em></h2><p>닉네임을 정해 주세요. 비워두면 랜덤 닉네임으로 입장해요.</p><form onSubmit={saveName}><input autoFocus maxLength={14} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="닉네임 (최대 14자)"/><button>입장하기 ↗</button></form><small>닉네임은 이 기기에 저장돼요.</small></motion.div></motion.div>}</AnimatePresence>
+    <AnimatePresence>{!archiveMode&&welcome&&<motion.div className="welcome-bg" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}><motion.div className="welcome" initial={{opacity:0,y:25,scale:.96}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:15}}><button className="close" onClick={()=>setWelcome(false)}><X/></button><div className="welcome-cat">🐈🎸</div><p className="eyebrow orange">DAEIL BAND</p><h2>Welcome<br/><em>to the Daeil Band!</em></h2><p>닉네임을 정해 주세요.</p><form onSubmit={saveName}><input autoFocus maxLength={14} value={draft} onChange={e=>setDraft(e.target.value)} placeholder="대일고양이"/><button>입장하기 ↗</button></form><small>닉네임은 최대 14자까지 ! </small></motion.div></motion.div>}</AnimatePresence>
     {!archiveMode&&nickname&&<button className="nickname" onClick={()=>{setDraft(nickname);setWelcome(true);}}>👋 {nickname}</button>}
     {!archiveMode&&checked&&!ready&&<div className="preview"><i/> 연결 확인 필요 <span>{setupMessage||"Supabase 연결과 테이블 설정을 확인해 주세요."}</span></div>}
   </main>
