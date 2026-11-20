@@ -46,6 +46,8 @@ function Reveal({children,className="",delay=0}) {
 }
 const SHOW_START_AT = new Date("2026-11-21T18:00:00+09:00").getTime();
 const SHOW_END_AT = new Date("2026-11-21T21:00:00+09:00").getTime();
+// 공연 페이지는 공연 종료 후 이틀 동안 유지하고, 11월 23일 21시에 추억 화면으로 전환합니다.
+const ARCHIVE_SWITCH_AT = new Date("2026-11-23T21:00:00+09:00").getTime();
 const SHOW_DAY_START = new Date("2026-11-21T00:00:00+09:00").getTime();
 // 공연 후 사진은 public/images/memories/에 추가한 뒤 아래 형식으로 등록합니다.
 // 파일 추가와 이 배열 수정 내용을 함께 GitHub에 push하면 Vercel이 자동 배포합니다.
@@ -57,15 +59,16 @@ const memoryPhotos = [
   // },
 ];
 
-function Countdown() {
+function Countdown({preview=false}) {
   const [now,setNow]=useState(null);
   useEffect(()=>{
     const tick=()=>setNow(Date.now());
     tick();const id=setInterval(tick,1000);return()=>clearInterval(id);
   },[]);
   if(now===null)return <div className="countdown countdown-loading"><span>DAEIL BAND · 2026</span></div>;
-  if(now>=SHOW_END_AT){
-    const days=Math.max(0,Math.floor((now-SHOW_DAY_START)/86400000));
+  if(preview||now>=SHOW_END_AT){
+    const displayNow=preview?ARCHIVE_SWITCH_AT:now;
+    const days=Math.max(0,Math.floor((displayNow-SHOW_DAY_START)/86400000));
     return <div className="countdown-after">
       <span>THANKS FOR COMING</span>
       <strong>D+{days}</strong>
@@ -116,6 +119,7 @@ export default function Home() {
   const [overlayMounted,setOverlayMounted]=useState(false);
   const [galleryEnabled,setGalleryEnabled]=useState(true);
   const [archiveMode,setArchiveMode]=useState(false);
+  const [previewMode,setPreviewMode]=useState(false);
   const hostCatTaps=useRef({count:0,last:0});
   const siteUrl="https://daeil-band.vercel.app";
   const {scrollYProgress}=useScroll();
@@ -135,8 +139,16 @@ export default function Home() {
   };
 
   useEffect(()=>{
+    const isArchivePreview=new URLSearchParams(window.location.search).get("preview")==="after";
+    if(isArchivePreview){
+      // 미리보기는 화면만 전환하며 방문자 등록, Supabase 조회/기록은 수행하지 않습니다.
+      setPreviewMode(true);
+      setArchiveMode(true);
+      setOverlayMounted(true);
+      return;
+    }
     setOverlayMounted(true);
-    const syncArchiveMode=()=>setArchiveMode(Date.now()>=SHOW_END_AT);
+    const syncArchiveMode=()=>setArchiveMode(Date.now()>=ARCHIVE_SWITCH_AT);
     syncArchiveMode();
     const archiveTimer=window.setInterval(syncArchiveMode,1000);
     if(Date.now()>=SHOW_END_AT)return()=>window.clearInterval(archiveTimer);
@@ -290,6 +302,7 @@ export default function Home() {
   };
 
   return <><main className="shell">
+    {previewMode&&<div className="preview-mode-banner"><strong>ARCHIVE PREVIEW</strong><span>미리보기 화면입니다. 실제 공개 전환 시각과 공연 기록은 변경되지 않습니다.</span><a href="/">실제 공연 페이지 보기</a></div>}
     <motion.div className="progress" style={{scaleX:progress}}/>
     <nav className="nav"><a className="logo cat-logo" href="#top" aria-label="대일밴드 처음으로"><img src="/images/cat-headphones.svg" alt="대일밴드 고양이 로고"/></a><div><a href="#about">소개</a><a href="#setlist">셋리스트</a><a href="#members">멤버</a><a href="#cheer">응원</a></div><a className="nav-cta" href="#questions">메시지 보내기 ↗</a></nav>
 
@@ -304,7 +317,7 @@ export default function Home() {
         <div className="stage-halo"/>
         <div className="video-window">{!videoError?<video src="/media/concert-cat.mp4" autoPlay muted loop playsInline preload="metadata" onError={()=>setVideoError(true)} aria-label="기타를 연주하는 고양이 영상"/>:<Cat/>}</div>
       </motion.div>
-      <div className="hero-countdown"><Countdown/></div>
+      <div className="hero-countdown"><Countdown preview={previewMode}/></div>
       <div className="hero-bottom hero-bottom-simple"><a href="#about">SCROLL TO EXPLORE <ArrowDown size={15}/></a></div>
     </section>
 
