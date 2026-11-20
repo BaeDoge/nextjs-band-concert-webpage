@@ -72,7 +72,7 @@ function Countdown({preview=false}) {
     return <div className="countdown-after">
       <span>THANKS FOR COMING</span>
       <strong>D+{days}</strong>
-      <small>그날의 함성, 오래도록 기억할게요.</small>
+      <small>다음에 다시 만나요.</small>
     </div>;
   }
   if(now>=SHOW_START_AT){
@@ -391,7 +391,7 @@ export default function Home() {
 
     {archiveMode&&<section className="section memory-archive" id="memories" aria-label="대일밴드 공연 추억 갤러리">
       <div className="kicker"><span>07 / MEMORIES</span><span>THE NIGHT IN FRAMES</span></div>
-      <div className="memory-archive-head"><p className="eyebrow orange">DAEIL BAND · 2026</p><h2>즐거웠던 공연,<br/><em>다시 만나요 !</em></h2><p>댈밴드의 추억 저장소</p></div>
+      <div className="memory-archive-head"><p className="eyebrow orange">DAEIL BAND · 2026</p><h2>즐거웠던 공연 !<br/><em>다음에 다시 만나요.</em></h2><p> Daeil Band | 2026.11.21 </p></div>
       {memoryPhotos.length>0?<div className="memory-photo-grid">{memoryPhotos.map((photo,index)=>{
         const src=typeof photo==="string"?photo:photo.src;
         const caption=typeof photo==="string"?"":photo.caption;
