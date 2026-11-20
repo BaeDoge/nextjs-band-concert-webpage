@@ -1,7 +1,7 @@
 "use client";
 import {useMemo,useState} from "react";
 import Link from "next/link";
-import {ArrowLeft,LockKeyhole,Send,CheckCircle2,RefreshCw,Trash2,Heart,Users,MessageSquare,ShieldBan,ShieldCheck,Search} from "lucide-react";
+import {ArrowLeft,Eye,LockKeyhole,Send,CheckCircle2,RefreshCw,Trash2,Heart,Users,MessageSquare,ShieldBan,ShieldCheck,Search} from "lucide-react";
 
 const emojiLabels={"🔥":"불꽃","👏":"박수","💛":"하트","🎸":"기타","🐈":"고양이","✨":"반짝"};
 
@@ -122,7 +122,7 @@ export default function HostPage(){
  const maxCheer=Math.max(1,...cheerRows.map(([,count])=>Number(count)));
 
  return <main className="host host-dashboard">
-  <Link href="/" className="host-back"><ArrowLeft size={16}/> 공연 페이지로</Link>
+  <div className="host-top-links"><Link href="/" className="host-back"><ArrowLeft size={16}/> 공연 페이지로</Link><Link href="/?preview=after" className="host-preview-link"><Eye size={15}/> 공연 후 화면 미리보기</Link></div>
   <header><small>DAEIL BAND · PRIVATE ADMIN</small><h1>운영자 <em>대시보드</em></h1><p>참여자, 응원, 메시지 및 사용자 관리를 확인합니다.</p></header>
   {!ok?
    <form className="host-login" onSubmit={event=>{event.preventDefault();load();}}>
